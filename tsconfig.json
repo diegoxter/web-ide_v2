@@ -14,8 +14,12 @@
     "plugins": [{
             "name": "typescript-svelte-plugin",
             "enabled": true,
-            "assumeIsSvelteProject": false         }]
-	}
+            "assumeIsSvelteProject": true         }]
+	},
+  "include": [
+    "src/**/*.d.ts",
+  ],
+  "exclude": ["node_modules"]
 	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias
 	// except $lib which is handled by https://svelte.dev/docs/kit/configuration#files
 	//

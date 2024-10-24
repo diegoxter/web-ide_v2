@@ -2,10 +2,13 @@
   import {
     Container,
     Col,
+    Icon,
     Nav,
     NavItem,
     NavLink,
     Row,
+    TabContent,
+    TabPane,
   } from "@sveltestrap/sveltestrap";
   import { Editor, DeployBar, FileExplorerBar } from "$lib";
 
@@ -22,10 +25,25 @@
 
   let isOpen = $state(true);
   let activeBar = $state("files");
+  let tabs: EditorTab[] = $state([
+    { fileName: "tab name 1" },
+    { fileName: "tab name 2" },
+  ]);
+  let activeTab: string | number = $state(
+    tabs.length > 0 ? tabs[0].fileName : "",
+  );
+  let hoveredTab = $state("");
 
   function closeSidebar(isCurrentTab: boolean, newTab: string) {
     isOpen = isCurrentTab ? !isOpen : true;
     activeBar = newTab;
+  }
+  function handleTabHover(isTabActive: boolean, isHovered: boolean) {
+    if (isTabActive) {
+      return "block";
+    } else {
+      return isHovered ? "block" : "none";
+    }
   }
 </script>
 
@@ -65,6 +83,38 @@
       {/if}
     </Col>
 
-    <Col><Editor /></Col>
+    <Col>
+      <Row class="border border-1">
+        <TabContent on:tab={(e) => (activeTab = e.detail)}>
+          {#if tabs.length > 0}
+            {#each tabs as tab, index}
+              <TabPane tabId={tab.fileName} active={activeTab == tab.fileName}>
+                <span
+                  slot="tab"
+                  onpointerover={() => (hoveredTab = tab.fileName)}
+                  onpointerleave={() => (hoveredTab = "")}
+                >
+                  {tab.fileName}
+                  <Icon
+                    name="x"
+                    style="display: {handleTabHover(
+                      activeTab == tab.fileName,
+                      hoveredTab == tab.fileName,
+                    )}"
+                  />
+                </span>
+                tab {index}
+              </TabPane>
+            {/each}
+          {:else}
+            empty tab bar
+          {/if}
+        </TabContent>
+      </Row>
+
+      <Row>
+        <Editor />
+      </Row>
+    </Col>
   </Row>
 </Container>

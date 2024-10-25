@@ -17,7 +17,7 @@
             "assumeIsSvelteProject": true         }]
 	},
   "include": [
-    "src/**/*.d.ts",
+    "src/**/*.d.ts"
   ],
   "exclude": ["node_modules"]
 	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias

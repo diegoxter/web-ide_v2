@@ -9,7 +9,14 @@ import {
 	snippets,
 	createSnippets,
 	registerSnippets,
+	script,
 } from "./lua_autocomplete";
+import {
+	openDatabase,
+	listDirectoriesWithFiles,
+	addFile,
+	addDirectory,
+} from "./db";
 
 export {
 	DeployBar,
@@ -18,6 +25,11 @@ export {
 	doLiveAutocomplete,
 	myCompleter,
 	snippets,
+	script,
 	createSnippets,
 	registerSnippets,
+	openDatabase,
+	listDirectoriesWithFiles,
+	addFile,
+	addDirectory,
 };

@@ -224,3 +224,23 @@ export function createSnippets(snippets) {
 		})
 		.join("\n");
 }
+
+export const script = `
+function test()
+  return 'Hello World!'
+end
+
+
+
+abi.register(test)
+
+--[[
+
+Available Lua modules:
+  string  math  table  bit
+
+Available Aergo modules:
+  system  contract  db  crypto  bignum  json
+
+]]
+`;

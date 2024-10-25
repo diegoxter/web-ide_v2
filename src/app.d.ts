@@ -11,6 +11,12 @@ declare global {
 
 	interface EditorTab {
 		fileName: String;
+		content: String;
+	}
+
+	interface DBFileEntry {
+		name: string;
+		files: string[];
 	}
 }
 

@@ -10,25 +10,40 @@
     TabContent,
     TabPane,
   } from "@sveltestrap/sveltestrap";
-  import { Editor, DeployBar, FileExplorerBar } from "$lib";
+  import {
+    Editor,
+    DeployBar,
+    FileExplorerBar,
+    openDatabase,
+    listDirectoriesWithFiles,
+    addDirectory,
+    addFile,
+    script,
+  } from "$lib";
+  import { onMount } from "svelte";
+
+  let isOpen: boolean = $state(true);
+  let activeBar: string = $state("files");
+  let db: IDBDatabase = $state(null);
 
   let links = [
     {
       path: "files",
-      icon: "E",
+      icon: "files",
     },
     {
       path: "deploy",
-      icon: "D",
+      icon: "plugin",
     },
   ];
 
-  let isOpen = $state(true);
-  let activeBar = $state("files");
+  let files: DBFileEntry[] = $state([]);
+
   let tabs: EditorTab[] = $state([
-    { fileName: "tab name 1" },
-    { fileName: "tab name 2" },
+    { fileName: "tab name 1", content: "file 1" },
+    { fileName: "tab name 2", content: "file 2" },
   ]);
+
   let activeTab: string | number = $state(
     tabs.length > 0 ? tabs[0].fileName : "",
   );
@@ -45,6 +60,46 @@
       return isHovered ? "block" : "none";
     }
   }
+
+  onMount(() => {
+    if (window && db == null) {
+      openDatabase()
+        .then((_db: IDBDatabase) => {
+          db = _db;
+
+          const transaction = db.transaction(["files"], "readonly");
+          const store = transaction.objectStore("files");
+          const request = store.openCursor();
+          request.onsuccess = (event) => {
+            const cursor = (event.target as IDBRequest<IDBCursor | null>)
+              .result;
+            if (!cursor) {
+              addDirectory(db, "contracts").then(() =>
+                addFile(db, 1, "test.lua", script).then((res) =>
+                  console.log("created ", res),
+                ),
+              );
+            }
+          };
+
+          request.onerror = (event: IDBRequest) => {
+            console.error(
+              "Error al verificar la existencia de entradas:",
+              (event.target as IDBRequest).error,
+            );
+          };
+        })
+        .catch((err: any) => console.error(err));
+    }
+  });
+  $effect(() => {
+    if (db) {
+      listDirectoriesWithFiles(db).then((res) => {
+        files = res;
+        console.log(res);
+      });
+    }
+  });
 </script>
 
 <Container fluid style="height: 100vmin">
@@ -64,7 +119,7 @@
                 activeBar === link.path ? "border-start border-2" : ""
               } rounded-0`}
             >
-              {link.icon}
+              <Icon name={link.icon} />
             </NavLink>
           </NavItem>
         {/each}
@@ -77,7 +132,7 @@
       style={`display: ${isOpen ? "block" : "none"}`}
     >
       {#if activeBar == "files"}
-        <FileExplorerBar />
+        <FileExplorerBar directories={files} />
       {:else if activeBar == "deploy"}
         <DeployBar />
       {/if}
@@ -87,12 +142,13 @@
       <Row class="border border-1">
         <TabContent on:tab={(e) => (activeTab = e.detail)}>
           {#if tabs.length > 0}
-            {#each tabs as tab, index}
+            {#each tabs as tab}
               <TabPane tabId={tab.fileName} active={activeTab == tab.fileName}>
                 <span
                   slot="tab"
                   onpointerover={() => (hoveredTab = tab.fileName)}
                   onpointerleave={() => (hoveredTab = "")}
+                  style="display: inline-flex; cursor: default;"
                 >
                   {tab.fileName}
                   <Icon
@@ -100,20 +156,17 @@
                     style="display: {handleTabHover(
                       activeTab == tab.fileName,
                       hoveredTab == tab.fileName,
-                    )}"
+                    )}; cursor: pointer;"
                   />
                 </span>
-                tab {index}
+
+                <Editor content={tab.content} />
               </TabPane>
             {/each}
           {:else}
             empty tab bar
           {/if}
         </TabContent>
-      </Row>
-
-      <Row>
-        <Editor />
       </Row>
     </Col>
   </Row>

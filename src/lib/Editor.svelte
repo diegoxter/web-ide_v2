@@ -6,9 +6,10 @@
     snippets,
     createSnippets,
     registerSnippets,
-  } from "$lib";
+  } from "./lua_autocomplete";
 
   let scriptLoaded = $state(false);
+  let { content } = $props();
 
   onMount(() => {
     if (typeof window !== "undefined" && (window as any).ace) {
@@ -58,23 +59,7 @@
 </svelte:head-->
 
 {#if scriptLoaded}
-  <div id="editor">
-  function test()
-    return 'Hello World!'
-end
-
-abi.register(test)
-
---[[
-
-Available Lua modules:
-  string math table bit
-
-Available Aergo modules:
-  system contract db crypto bignum json
-
-]]
-  </div>
+  <div id="editor">{content}</div>
 {:else}
   Loading editor...
 {/if}

@@ -23,6 +23,7 @@
   import { onMount } from "svelte";
 
   let isOpen: boolean = $state(true);
+  let files: DBFileEntry[] = $state([]);
   let activeBar: string = $state("files");
   let db: IDBDatabase = $state(null);
 
@@ -37,8 +38,6 @@
     },
   ];
 
-  let files: DBFileEntry[] = $state([]);
-
   let tabs: EditorTab[] = $state([
     { fileName: "tab name 1", content: "file 1" },
     { fileName: "tab name 2", content: "file 2" },
@@ -47,6 +46,11 @@
   let activeTab: string | number = $state(
     tabs.length > 0 ? tabs[0].fileName : "",
   );
+  let activeTabContent = $derived.by(() => {
+    let content: string;
+
+    return content;
+  });
   let hoveredTab = $state("");
 
   function closeSidebar(isCurrentTab: boolean, newTab: string) {
@@ -75,9 +79,9 @@
               .result;
             if (!cursor) {
               addDirectory(db, "contracts").then(() =>
-                addFile(db, 1, "test.lua", script).then((res) =>
-                  console.log("created ", res),
-                ),
+                addFile(db, 1, "test.lua", script).then(() => {
+                  listDirectoriesWithFiles(db).then((res) => (files = res));
+                }),
               );
             }
           };
@@ -92,12 +96,10 @@
         .catch((err: any) => console.error(err));
     }
   });
+
   $effect(() => {
-    if (db) {
-      listDirectoriesWithFiles(db).then((res) => {
-        files = res;
-        console.log(res);
-      });
+    if (db && files.length == 0) {
+      listDirectoriesWithFiles(db).then((res) => (files = res));
     }
   });
 </script>
@@ -159,14 +161,15 @@
                     )}; cursor: pointer;"
                   />
                 </span>
-
-                <Editor content={tab.content} />
               </TabPane>
             {/each}
           {:else}
             empty tab bar
           {/if}
         </TabContent>
+      </Row>
+      <Row>
+        <Editor content={activeTab} />
       </Row>
     </Col>
   </Row>

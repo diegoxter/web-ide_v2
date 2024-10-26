@@ -8,29 +8,34 @@
     registerSnippets,
   } from "./lua_autocomplete";
 
+  let { content }: { content: string } = $props();
   let scriptLoaded = $state(false);
-  let { content } = $props();
+  let ace = $state(null);
 
-  onMount(() => {
-    if (typeof window !== "undefined" && (window as any).ace) {
+  function loadAce() {
+    return new Promise((resolve) => {
+      import("ace-builds").then((ace) => {
+        resolve(ace);
+      });
+    });
+  }
+
+  onMount(async () => {
+    if (typeof window !== "undefined") {
+      const _ace = await loadAce();
+      ace = _ace;
+
+      ace.config.set(
+        "basePath",
+        "https://unpkg.com/ace-builds@1.36.3/src-noconflict",
+      );
+
       scriptLoaded = true;
-    } else {
-      const script = document.createElement("script");
-      script.src = "/ace/ace.js";
-      script.type = "text/javascript";
-
-      script.onload = () => {
-        scriptLoaded = true;
-      };
-
-      document.head.appendChild(script);
     }
   });
 
   $effect(() => {
-    if (scriptLoaded) {
-      const ace = (window as any).ace;
-
+    if (ace && scriptLoaded) {
       const editor = ace.edit("editor");
       editor.session.setMode("ace/mode/lua");
       editor.setTheme("ace/theme/tomorrow_night_bright");
@@ -54,12 +59,10 @@
   });
 </script>
 
-<!--svelte:head>
-  <script src="/ace/ace.js" type="text/javascript"></script>
-</svelte:head-->
-
 {#if scriptLoaded}
-  <div id="editor">{content}</div>
+  <div id="editor">
+    {content}
+  </div>
 {:else}
   Loading editor...
 {/if}
@@ -67,6 +70,6 @@
 <style>
   #editor {
     position: relative;
-    min-height: 100vh;
+    min-height: 92.9vh;
   }
 </style>

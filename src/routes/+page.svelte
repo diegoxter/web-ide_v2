@@ -108,7 +108,7 @@
   <Row style="height: 100%">
     <Col
       xs="1"
-      style="width: 5%; margin-right: 8px; background: rgb(63 63 63);"
+      style="width: 5%; margin-right: 2px; background: rgb(63 63 63);"
       class="border-end p-1"
     >
       <Nav vertical class="nav-pills">

@@ -1,5 +1,7 @@
 <script lang="ts">
   import { Icon } from "@sveltestrap/sveltestrap";
+  import FExpToolbar from "./FExpToolbar.svelte";
+
   let { directories } = $props();
 
   let isOpen = $state([]);
@@ -17,14 +19,19 @@
 
 <h6>File Explorer</h6>
 
+<FExpToolbar />
+
 {#each (directories as DBFileEntry) as directory}
   <div type="button" class="folder" onclick={() => handleDirectoryClick(directory.name)} >
     <Icon
       name={isOpen.includes(directory.name) ? "folder2-open" : "folder"}
-      style=" cursor: pointer;"
+      style="cursor: pointer;"
     />
     &nbsp;
-    <span style={`background: ${isOpen.includes(directory.name)? "black":"white"}; color : ${isOpen.includes(directory.name)? "white":"black"}`}>{directory.name}</span>
+    <span 
+      style:background={isOpen.includes(directory.name)? "#333232a6":""}
+      style:color={isOpen.includes(directory.name)? "white":""}
+    >{directory.name}</span>
   </div>
 
   {#if isOpen.includes(directory.name)}
@@ -47,18 +54,26 @@
   }
 
   .folder {
-    border: 0;
     background: white;
     margin-block-start: 0;
     padding-inline-start: 0;
     user-select: none;
     cursor:default;
 
+    span {
+      border: 1px solid white;
+      border-radius: 6px;
+      padding: 0 6px;
+    }
+
+
     &:hover {
       span {
-        background: black;
+        background: #595959;
         color: white;
       }
     }
   }
+
+  
 </style>

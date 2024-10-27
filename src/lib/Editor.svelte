@@ -7,12 +7,13 @@
     createSnippets,
     registerSnippets,
   } from "./lua_autocomplete";
+  import { Ace } from "ace-builds";
 
-  let { content }: { content: string } = $props();
+  let { content }: { content: String } = $props();
   let scriptLoaded = $state(false);
-  let ace = $state(null);
+  let ace: Ace.Editor | null = $state(null);
 
-  function loadAce() {
+  function loadAce(): Promise<any> {
     return new Promise((resolve) => {
       import("ace-builds").then((ace) => {
         resolve(ace);
@@ -24,6 +25,10 @@
     if (typeof window !== "undefined") {
       const _ace = await loadAce();
       ace = _ace;
+
+      if (!ace) {
+        return;
+      }
 
       ace.config.set(
         "basePath",

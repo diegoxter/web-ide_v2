@@ -25,7 +25,7 @@
   let isOpen: boolean = $state(true);
   let files: DBFileEntry[] = $state([]);
   let activeBar: string = $state("files");
-  let db: IDBDatabase = $state(null);
+  let db: IDBDatabase | null = $state(null);
 
   let links = [
     {
@@ -43,14 +43,14 @@
     { fileName: "tab name 2", content: "file 2" },
   ]);
 
-  let activeTab: string | number = $state(
+  let activeTab: String | number = $state(
     tabs.length > 0 ? tabs[0].fileName : "",
   );
-  let activeTabContent = $derived.by(() => {
-    let content: string;
-
-    return content;
-  });
+  //let activeTabContent = $derived.by(() => {
+  //  let content: string = "";
+  //
+  //  return content;
+  //});
   let hoveredTab = $state("");
 
   function closeSidebar(isCurrentTab: boolean, newTab: string) {
@@ -68,7 +68,10 @@
   onMount(() => {
     if (window && db == null) {
       openDatabase()
-        .then((_db: IDBDatabase) => {
+        .then((_db: IDBDatabase | null) => {
+          if (!_db) {
+            return;
+          }
           db = _db;
 
           const transaction = db.transaction(["files"], "readonly");
@@ -78,9 +81,11 @@
             const cursor = (event.target as IDBRequest<IDBCursor | null>)
               .result;
             if (!cursor) {
-              addDirectory(db, "contracts").then(() =>
-                addFile(db, 1, "test.lua", script).then(() => {
-                  listDirectoriesWithFiles(db).then((res) => (files = res));
+              addDirectory(db as IDBDatabase, "contracts").then(() =>
+                addFile(db as IDBDatabase, 1, "test.lua", script).then(() => {
+                  listDirectoriesWithFiles(db as IDBDatabase).then(
+                    (res) => (files = res),
+                  );
                 }),
               );
             }
@@ -169,7 +174,7 @@
         </TabContent>
       </Row>
       <Row>
-        <Editor content={activeTab} />
+        <Editor content={activeTab as String} />
       </Row>
     </Col>
   </Row>

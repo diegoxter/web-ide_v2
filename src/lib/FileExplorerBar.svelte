@@ -2,9 +2,18 @@
   import { Icon } from "@sveltestrap/sveltestrap";
   import FExpToolbar from "./FExpToolbar.svelte";
 
+  interface File {
+    name: string
+  }
+
+  interface DBFileEntry {
+		name: string;
+		files: File[];
+	}
+
   let { directories } = $props();
 
-  let isOpen = $state([]);
+  let isOpen: string[] = $state([]);
 
   function handleDirectoryClick(directoryName: string) {
     if (isOpen.includes(directoryName)) {
@@ -21,8 +30,8 @@
 
 <FExpToolbar />
 
-{#each (directories as DBFileEntry) as directory}
-  <div type="button" class="folder" onclick={() => handleDirectoryClick(directory.name)} >
+{#each (directories as DBFileEntry[]) as directory}
+  <div class="folder" onclick={() => handleDirectoryClick(directory.name)} >
     <Icon
       name={isOpen.includes(directory.name) ? "folder2-open" : "folder"}
       style="cursor: pointer;"

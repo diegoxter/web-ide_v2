@@ -10,8 +10,8 @@ declare global {
 	}
 
 	interface EditorTab {
-		fileName: String;
-		content: String;
+		fileName: string;
+		content: string;
 	}
 
 	interface DBFileEntry {

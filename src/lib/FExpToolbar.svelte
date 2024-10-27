@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Col, Container, Icon, Row } from "@sveltestrap/sveltestrap";
+  import { Icon } from "@sveltestrap/sveltestrap";
 
   interface FileToolbarButtonData {
     icon: string;

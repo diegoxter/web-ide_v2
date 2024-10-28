@@ -42,8 +42,8 @@
   ];
 
   let tabs: EditorTab[] = $state([
-    { fileName: "tab name 1", content: "file 1" },
-    { fileName: "tab name 2", content: "file 2" },
+    { directory: "", fileName: "tab name 1", content: "file 1" },
+    { directory: "", fileName: "tab name 2", content: "file 2" },
   ]);
 
   let activeTab: number = $state(0);
@@ -57,6 +57,7 @@
   });
   // biome-ignore lint/style/useConst: svelte variable
   let hoveredTab = $state("");
+  let selectedFile: string | null = $state(null)
 
   function closeSidebar(isCurrentTab: boolean, newTab: string) {
     isOpen = isCurrentTab ? !isOpen : true;
@@ -67,7 +68,34 @@
     const newArray = tabs.filter((_, i) => i !== tabIndex);
 
     tabs = newArray;
+    console.log(tabIndex )
+    console.log(tabIndex - 1 < 0 ? 0 : tabIndex - 1)
     activeTab = tabIndex - 1 < 0 ? 0 : tabIndex - 1;
+  }
+
+  function openFile(e: string) {
+    if (selectedFile === e) {
+      selectedFile = null
+      const directoryAndFileNames = e.split("-")
+
+      const fileHasATab = tabs.some(item => item.directory === directoryAndFileNames[0] && item.fileName === directoryAndFileNames[1])
+
+      if (fileHasATab) {
+        const indexOfFiletab = tabs.findIndex(item => item.directory === directoryAndFileNames[0] && item.fileName === directoryAndFileNames[1])
+
+        activeTab = indexOfFiletab
+      } else {
+        tabs.push({
+          directory: directoryAndFileNames[0],
+          fileName: directoryAndFileNames[1],
+          content: `content for the ${directoryAndFileNames[1]} file in directory ${directoryAndFileNames[0]}`
+        })
+
+        activeTab = tabs.length - 1
+      }
+    } else {
+      selectedFile = e
+    }
   }
 
   onMount(() => {
@@ -147,7 +175,11 @@
       style={`display: ${isOpen ? "block" : "none"}`}
     >
       {#if activeBar == "files"}
-        <FileExplorerBar directories={files} />
+        <FileExplorerBar
+          directories={files}
+          openFile={openFile}
+          selectedFile={selectedFile}
+        />
       {:else if activeBar == "deploy"}
         <DeployBar />
       {/if}
@@ -171,7 +203,7 @@
       </Row>
       <Row>
         {#if tabs.length > 0}
-          <Editor tabsContent={activeTabContent} {activeTab} />
+          <Editor tabsContent={activeTabContent} activeTab={activeTab} />
         {:else}
           <HomeTab />
         {/if}

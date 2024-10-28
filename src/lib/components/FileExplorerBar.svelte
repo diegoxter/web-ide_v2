@@ -3,7 +3,9 @@
   import FExpToolbar from "./FExpToolbar.svelte";
 
   // biome-ignore lint/style/useConst: svelte variable
-  let { directories } = $props();
+  let hoveredFile: string | null = $state(null)
+  // biome-ignore lint/style/useConst: svelte variable
+  let { directories, openFile, selectedFile }: {directories: DBDirectoryEntry[], openFile: (e: string)=> void, selectedFile: string | null } = $props();
 
   let isOpen: string[] = $state([]);
 
@@ -13,6 +15,17 @@
       isOpen = newArray
     } else {
       isOpen.push(directoryName);
+    }
+  }
+
+  function returnLiBackground(fileName: string, directoryName: string) {
+    if (hoveredFile === fileName) {
+      return "#858585a6"
+    }
+
+    const thisFile = `${directoryName}-${fileName}`
+    if (selectedFile === thisFile) {
+      return "#b7b7b785"
     }
   }
 
@@ -34,12 +47,24 @@
     <span
       style:background={isOpen.includes(directory.name)? "#333232a6":""}
       style:color={isOpen.includes(directory.name)? "white":""}
-    >{directory.name}</span>
+    >
+      {directory.name}
+    </span>
   </div>
 
   {#if isOpen.includes(directory.name)}
       {#each directory.files as file}
-        <li>
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+        <li
+          id={`${directory.name}-${file.name}`}
+          onmouseenter={() => hoveredFile = file.name}
+          onmouseleave={() => hoveredFile = null}
+          onclick={(e) => openFile((e.target as HTMLElement).id)}
+          style:border={hoveredFile === file.name? "1px solid #333232a6":""}
+          style:background={returnLiBackground(file.name, directory.name)}
+          style:color={hoveredFile === file.name? "white":""}
+        >
           <Icon name="file-code" style=" cursor: pointer;" />
           {file.name}
         </li>

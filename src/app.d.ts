@@ -10,6 +10,7 @@ declare global {
 	}
 
 	interface EditorTab {
+    directory: string;
 		fileName: string;
 		content: string;
 	}

@@ -64,6 +64,8 @@
       }, 3000);
 
       if (tabsContent.length > 0) {
+        console.log(tabsContent)
+        console.log(activeTab)
         const session = ace.createEditSession(
           tabsContent[activeTab],
           "ace/mode/lua",

@@ -43,12 +43,14 @@
     { fileName: "tab name 2", content: "file 2" },
   ]);
 
-  let activeTab:  number = $state(0);
-  //let activeTabContent = $derived.by(() => {
-  //  let content: string = "";
-  //
-  //  return content;
-  //});
+  let activeTab: number = $state(0);
+  let activeTabContent = $derived.by(() => {
+    const tabsContent = tabs.map((tab) => {
+      return tab.content;
+    });
+
+    return tabsContent;
+  });
   let hoveredTab = $state("");
 
   function closeSidebar(isCurrentTab: boolean, newTab: string) {
@@ -157,7 +159,7 @@
         </TabContent>
       </Row>
       <Row>
-        <Editor content={tabs[activeTab].fileName as String} />
+        <Editor tabsContent={activeTabContent} {activeTab} />
       </Row>
     </Col>
   </Row>

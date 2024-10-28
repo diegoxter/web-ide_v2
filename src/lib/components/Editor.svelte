@@ -9,7 +9,8 @@
   } from "../lua_autocomplete";
   import * as Ace from "ace-builds";
 
-  let { content }: { content: String } = $props();
+  let { tabsContent, activeTab }: { tabsContent: string[]; activeTab: number } =
+    $props();
   let scriptLoaded = $state(false);
   let ace: typeof Ace | null = $state(null);
 
@@ -60,13 +61,20 @@
       setTimeout(function () {
         registerSnippets(ace, "lua", createSnippets(snippets));
       }, 3000);
+
+      console.log(tabsContent[activeTab]);
+      let session = ace.createEditSession(
+        tabsContent[activeTab],
+        "ace/mode/lua",
+      );
+      editor.setSession(session);
     }
   });
 </script>
 
 {#if scriptLoaded}
   <div id="editor">
-    {content}
+    {tabsContent}
   </div>
 {:else}
   Loading editor...

@@ -63,7 +63,7 @@
         registerSnippets(ace, "lua", createSnippets(snippets));
       }, 3000);
 
-      if (tabsContent[activeTab]) {
+      if (tabsContent.length > 0) {
         const session = ace.createEditSession(
           tabsContent[activeTab],
           "ace/mode/lua",

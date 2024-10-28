@@ -8,10 +8,11 @@
     NavLink,
     Row,
     TabContent,
+    TabPane
   } from "@sveltestrap/sveltestrap";
   import {
     Editor,
-    EditorTabBar,
+    EditorTabComp,
     DeployBar,
     FileExplorerBar,
     openDatabase,
@@ -156,10 +157,14 @@
         <TabContent on:tab={(e) => (activeTab = Number(e.detail))}>
           {#if tabs.length > 0}
             {#each tabs as tab, i}
-              <EditorTabBar {activeTab} {hoveredTab} {i} {tab} {closeTab} />
+              <EditorTabComp {activeTab} {hoveredTab} {i} {tab} {closeTab} />
             {/each}
-          {:else}
-            empty tab bar
+          {:else }
+            <TabPane active tabId={"Home"}>
+              <span slot="tab">
+                Home
+              </span>
+            </TabPane>
           {/if}
         </TabContent>
       </Row>

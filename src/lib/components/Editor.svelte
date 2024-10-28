@@ -6,12 +6,12 @@
     snippets,
     createSnippets,
     registerSnippets,
-  } from "./lua_autocomplete";
-  import { Ace } from "ace-builds";
+  } from "../lua_autocomplete";
+  import * as Ace from "ace-builds";
 
   let { content }: { content: String } = $props();
   let scriptLoaded = $state(false);
-  let ace: Ace.Editor | null = $state(null);
+  let ace: typeof Ace | null = $state(null);
 
   function loadAce(): Promise<any> {
     return new Promise((resolve) => {

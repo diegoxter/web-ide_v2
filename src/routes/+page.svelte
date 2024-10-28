@@ -15,6 +15,7 @@
     EditorTabComp,
     DeployBar,
     FileExplorerBar,
+    HomeTab,
     openDatabase,
     listDirectoriesWithFiles,
     addDirectory,
@@ -169,7 +170,11 @@
         </TabContent>
       </Row>
       <Row>
-        <Editor tabsContent={activeTabContent} {activeTab} />
+        {#if tabs.length > 0}
+          <Editor tabsContent={activeTabContent} {activeTab} />
+        {:else}
+          <HomeTab />
+        {/if}
       </Row>
     </Col>
   </Row>

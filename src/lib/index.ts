@@ -4,6 +4,7 @@ import DeployBar from "./components/DeployBar.svelte";
 import FileExplorerBar from "./components/FileExplorerBar.svelte";
 import Editor from "./components/Editor.svelte";
 import EditorTabComp from "./components/EditorTabComp.svelte";
+import HomeTab from "./components/HomeTab.svelte";
 
 import {
 	doLiveAutocomplete,
@@ -27,6 +28,7 @@ export {
 	Editor,
 	EditorTabComp,
 	doLiveAutocomplete,
+  HomeTab,
 	myCompleter,
 	snippets,
 	script,

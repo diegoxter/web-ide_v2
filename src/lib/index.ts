@@ -3,6 +3,8 @@
 import DeployBar from "./components/DeployBar.svelte";
 import FileExplorerBar from "./components/FileExplorerBar.svelte";
 import Editor from "./components/Editor.svelte";
+import EditorTabBar from "./components/EditorTabBar.svelte";
+
 import {
 	doLiveAutocomplete,
 	myCompleter,
@@ -11,6 +13,7 @@ import {
 	registerSnippets,
 	script,
 } from "./lua_autocomplete";
+
 import {
 	openDatabase,
 	listDirectoriesWithFiles,
@@ -22,6 +25,7 @@ export {
 	DeployBar,
 	FileExplorerBar,
 	Editor,
+	EditorTabBar,
 	doLiveAutocomplete,
 	myCompleter,
 	snippets,

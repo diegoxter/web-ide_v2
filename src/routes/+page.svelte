@@ -8,10 +8,10 @@
     NavLink,
     Row,
     TabContent,
-    TabPane,
   } from "@sveltestrap/sveltestrap";
   import {
     Editor,
+    EditorTabBar,
     DeployBar,
     FileExplorerBar,
     openDatabase,
@@ -59,17 +59,9 @@
   function closeTab(tabIndex: number) {
     const newArray = tabs.filter((_, i) => i !== tabIndex);
 
-    tabs = newArray
-    console.log(newArray[tabIndex - 1 < 0? 0 : tabIndex - 1].fileName)
-    activeTab = tabIndex - 1 < 0? 0 : tabIndex - 1
-  }
-
-  function handleTabHover(isTabActive: boolean, isHovered: boolean) {
-    if (isTabActive) {
-      return "block";
-    } else {
-      return isHovered ? "block" : "none";
-    }
+    tabs = newArray;
+    console.log(newArray[tabIndex - 1 < 0 ? 0 : tabIndex - 1].fileName);
+    activeTab = tabIndex - 1 < 0 ? 0 : tabIndex - 1;
   }
 
   onMount(() => {
@@ -154,28 +146,10 @@
 
     <Col>
       <Row class="border border-1">
-        <TabContent on:tab={(e) => (activeTab == e.detail)}>
+        <TabContent on:tab={(e) => (activeTab = Number(e.detail))}>
           {#if tabs.length > 0}
             {#each tabs as tab, i}
-              <TabPane tabId={i} active={activeTab == i}>
-                <span
-                  slot="tab"
-                  onpointerover={() => (hoveredTab = tab.fileName)}
-                  onpointerleave={() => (hoveredTab = "")}
-                  style="display: inline-flex; cursor: default;"
-                >
-                  {tab.fileName}
-                  <button onclick={()=> closeTab(i)} type="button" class="tab-close-btn">
-                    <Icon
-                      name="x"
-                      style="display: {handleTabHover(
-                        activeTab == i,
-                        hoveredTab == tab.fileName,
-                      )}; cursor: pointer;"
-                    />
-                  </button>
-                </span>
-              </TabPane>
+              <EditorTabBar {activeTab} {hoveredTab} {i} {tab} {closeTab} />
             {/each}
           {:else}
             empty tab bar
@@ -188,10 +162,3 @@
     </Col>
   </Row>
 </Container>
-
-<style>
-  .tab-close-btn {
-    border: 0;
-    background: local;
-  }
-</style>

@@ -7,14 +7,15 @@
     createSnippets,
     registerSnippets,
   } from "../lua_autocomplete";
-  import * as Ace from "ace-builds";
+  import type * as Ace from "ace-builds";
 
+  // biome-ignore lint/style/useConst: svelte variable
   let { tabsContent, activeTab }: { tabsContent: string[]; activeTab: number } =
     $props();
   let scriptLoaded = $state(false);
   let ace: typeof Ace | null = $state(null);
 
-  function loadAce(): Promise<any> {
+  function loadAce(): Promise<typeof Ace> {
     return new Promise((resolve) => {
       import("ace-builds").then((ace) => {
         resolve(ace);
@@ -49,25 +50,26 @@
       editor.session.setOptions({ tabSize: 2, useSoftTabs: true });
       editor.setShowPrintMargin(false);
 
-      ace.config.loadModule("ace/ext/language_tools", function () {
+      ace.config.loadModule("ace/ext/language_tools", (ext) => {
+        ext.addCompleter(myCompleter);
         editor.setOptions({
           enableSnippets: true,
           enableBasicAutocompletion: true,
-          enableLiveAutocompletion: myCompleter,
         });
       });
       editor.commands.on("afterExec", doLiveAutocomplete);
 
-      setTimeout(function () {
+      setTimeout(() => {
         registerSnippets(ace, "lua", createSnippets(snippets));
       }, 3000);
 
-      console.log(tabsContent[activeTab]);
-      let session = ace.createEditSession(
-        tabsContent[activeTab],
-        "ace/mode/lua",
-      );
-      editor.setSession(session);
+      if (tabsContent[activeTab]) {
+        const session = ace.createEditSession(
+          tabsContent[activeTab],
+          "ace/mode/lua",
+        );
+        editor.setSession(session);
+      }
     }
   });
 </script>

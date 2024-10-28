@@ -2,22 +2,14 @@
   import { Icon } from "@sveltestrap/sveltestrap";
   import FExpToolbar from "./FExpToolbar.svelte";
 
-  interface File {
-    name: string
-  }
-
-  interface DBFileEntry {
-		name: string;
-		files: File[];
-	}
-
+  // biome-ignore lint/style/useConst: svelte variable
   let { directories } = $props();
 
   let isOpen: string[] = $state([]);
 
   function handleDirectoryClick(directoryName: string) {
     if (isOpen.includes(directoryName)) {
-      const newArray = isOpen.filter(name => name != directoryName)
+      const newArray = isOpen.filter(name => name !== directoryName)
       isOpen = newArray
     } else {
       isOpen.push(directoryName);
@@ -30,14 +22,16 @@
 
 <FExpToolbar />
 
-{#each (directories as DBFileEntry[]) as directory}
+{#each (directories as DBDirectoryEntry[]) as directory}
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div class="folder" onclick={() => handleDirectoryClick(directory.name)} >
     <Icon
       name={isOpen.includes(directory.name) ? "folder2-open" : "folder"}
       style="cursor: pointer;"
     />
     &nbsp;
-    <span 
+    <span
       style:background={isOpen.includes(directory.name)? "#333232a6":""}
       style:color={isOpen.includes(directory.name)? "white":""}
     >{directory.name}</span>

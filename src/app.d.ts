@@ -14,10 +14,17 @@ declare global {
 		content: string;
 	}
 
-	interface DBFileEntry {
-		name: string;
-		files: string[];
-	}
+  interface FileEntry {
+    name: string;
+    content: string;
+    id: number;
+    directoryId: number
+  }
+
+  interface DBDirectoryEntry {
+    name: string;
+    files: FileEntry[];
+  }
 }
 
 export {};

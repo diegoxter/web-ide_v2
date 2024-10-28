@@ -1,6 +1,7 @@
 <script lang="ts">
   import { TabPane, Icon } from "@sveltestrap/sveltestrap";
 
+  // biome-ignore lint/style/useConst: svelte variable
   let {
     activeTab,
     hoveredTab,
@@ -18,9 +19,9 @@
   function handleTabHover(isTabActive: boolean, isHovered: boolean) {
     if (isTabActive) {
       return "block";
-    } else {
-      return isHovered ? "block" : "none";
     }
+
+    return isHovered ? "block" : "none";
   }
 </script>
 

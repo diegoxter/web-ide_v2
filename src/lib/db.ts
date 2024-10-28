@@ -1,6 +1,13 @@
-interface DBFileEntry {
+interface FileEntry {
 	name: string;
-	files: string[];
+	content: string;
+	id: number;
+	directoryId: number;
+}
+
+interface DBDirectoryEntry {
+	name: string;
+	files: FileEntry[];
 }
 
 export function openDatabase(): Promise<IDBDatabase | null> {
@@ -106,13 +113,13 @@ export async function addFile(
 
 export async function listDirectoriesWithFiles(
 	db: IDBDatabase,
-): Promise<DBFileEntry[]> {
+): Promise<DBDirectoryEntry[]> {
 	return new Promise((resolve, reject) => {
 		const transaction = db.transaction(["directories", "files"], "readonly");
 		const dirStore = transaction.objectStore("directories");
 		const fileStore = transaction.objectStore("files");
 
-		const directories: DBFileEntry[] = [];
+		const directories: DBDirectoryEntry[] = [];
 
 		const dirRequest = dirStore.openCursor();
 
@@ -124,13 +131,13 @@ export async function listDirectoriesWithFiles(
 				const dirId = cursor.value.id;
 				const dirName = cursor.value.name;
 
-				const currentDirectory: DBFileEntry = { name: dirName, files: [] };
+				const currentDirectory: DBDirectoryEntry = { name: dirName, files: [] };
 				const fileRequest = fileStore
 					.index("directory_name")
 					.getAll(IDBKeyRange.bound([dirId, ""], [dirId, "\uffff"]));
 
 				fileRequest.onsuccess = (event) => {
-					const files = (event.target as IDBRequest<any[]>).result;
+					const files = (event.target as IDBRequest<FileEntry[]>).result;
 					currentDirectory.files = files;
 					directories.push(currentDirectory);
 

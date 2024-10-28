@@ -23,10 +23,11 @@
   import { onMount } from "svelte";
 
   let isOpen: boolean = $state(true);
-  let files: DBFileEntry[] = $state([]);
+  let files: DBDirectoryEntry[] = $state([]);
   let activeBar: string = $state("files");
   let db: IDBDatabase | null = $state(null);
 
+  // biome-ignore lint/style/useConst: svelte variable
   let links = [
     {
       path: "files",
@@ -44,6 +45,7 @@
   ]);
 
   let activeTab: number = $state(0);
+  // biome-ignore lint/style/useConst: svelte variable
   let activeTabContent = $derived.by(() => {
     const tabsContent = tabs.map((tab) => {
       return tab.content;
@@ -51,6 +53,7 @@
 
     return tabsContent;
   });
+  // biome-ignore lint/style/useConst: svelte variable
   let hoveredTab = $state("");
 
   function closeSidebar(isCurrentTab: boolean, newTab: string) {
@@ -62,7 +65,6 @@
     const newArray = tabs.filter((_, i) => i !== tabIndex);
 
     tabs = newArray;
-    console.log(newArray[tabIndex - 1 < 0 ? 0 : tabIndex - 1].fileName);
     activeTab = tabIndex - 1 < 0 ? 0 : tabIndex - 1;
   }
 
@@ -84,28 +86,31 @@
             if (!cursor) {
               addDirectory(db as IDBDatabase, "contracts").then(() =>
                 addFile(db as IDBDatabase, 1, "test.lua", script).then(() => {
-                  listDirectoriesWithFiles(db as IDBDatabase).then(
-                    (res) => (files = res),
-                  );
+                  listDirectoriesWithFiles(db as IDBDatabase).then((res) => {
+                    files = res;
+                  });
                 }),
               );
             }
           };
 
-          request.onerror = (event: IDBRequest) => {
+          request.onerror = (event) => {
             console.error(
               "Error al verificar la existencia de entradas:",
               (event.target as IDBRequest).error,
             );
           };
         })
+        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
         .catch((err: any) => console.error(err));
     }
   });
 
   $effect(() => {
-    if (db && files.length == 0) {
-      listDirectoriesWithFiles(db).then((res) => (files = res));
+    if (db && files.length === 0) {
+      listDirectoriesWithFiles(db).then((res) => {
+        files = res;
+      });
     }
   });
 </script>

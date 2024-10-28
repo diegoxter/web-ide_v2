@@ -43,9 +43,7 @@
     { fileName: "tab name 2", content: "file 2" },
   ]);
 
-  let activeTab: String | number = $state(
-    tabs.length > 0 ? tabs[0].fileName : "",
-  );
+  let activeTab:  number = $state(0);
   //let activeTabContent = $derived.by(() => {
   //  let content: string = "";
   //
@@ -57,6 +55,15 @@
     isOpen = isCurrentTab ? !isOpen : true;
     activeBar = newTab;
   }
+
+  function closeTab(tabIndex: number) {
+    const newArray = tabs.filter((_, i) => i !== tabIndex);
+
+    tabs = newArray
+    console.log(newArray[tabIndex - 1 < 0? 0 : tabIndex - 1].fileName)
+    activeTab = tabIndex - 1 < 0? 0 : tabIndex - 1
+  }
+
   function handleTabHover(isTabActive: boolean, isHovered: boolean) {
     if (isTabActive) {
       return "block";
@@ -147,10 +154,10 @@
 
     <Col>
       <Row class="border border-1">
-        <TabContent on:tab={(e) => (activeTab = e.detail)}>
+        <TabContent on:tab={(e) => (activeTab == e.detail)}>
           {#if tabs.length > 0}
-            {#each tabs as tab}
-              <TabPane tabId={tab.fileName} active={activeTab == tab.fileName}>
+            {#each tabs as tab, i}
+              <TabPane tabId={i} active={activeTab == i}>
                 <span
                   slot="tab"
                   onpointerover={() => (hoveredTab = tab.fileName)}
@@ -158,13 +165,15 @@
                   style="display: inline-flex; cursor: default;"
                 >
                   {tab.fileName}
-                  <Icon
-                    name="x"
-                    style="display: {handleTabHover(
-                      activeTab == tab.fileName,
-                      hoveredTab == tab.fileName,
-                    )}; cursor: pointer;"
-                  />
+                  <button onclick={()=> closeTab(i)} type="button" class="tab-close-btn">
+                    <Icon
+                      name="x"
+                      style="display: {handleTabHover(
+                        activeTab == i,
+                        hoveredTab == tab.fileName,
+                      )}; cursor: pointer;"
+                    />
+                  </button>
                 </span>
               </TabPane>
             {/each}
@@ -174,8 +183,15 @@
         </TabContent>
       </Row>
       <Row>
-        <Editor content={activeTab as String} />
+        <Editor content={tabs[activeTab].fileName as String} />
       </Row>
     </Col>
   </Row>
 </Container>
+
+<style>
+  .tab-close-btn {
+    border: 0;
+    background: local;
+  }
+</style>

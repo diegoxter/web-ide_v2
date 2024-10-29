@@ -8,7 +8,7 @@
     NavLink,
     Row,
     TabContent,
-    TabPane
+    TabPane,
   } from "@sveltestrap/sveltestrap";
   import {
     Editor,
@@ -48,16 +48,11 @@
 
   let activeTab: number = $state(0);
   // biome-ignore lint/style/useConst: svelte variable
-  let activeTabContent = $derived.by(() => {
-    const tabsContent = tabs.map((tab) => {
-      return tab.content;
-    });
+  let activeTabContent: string | null = $state(null);
 
-    return tabsContent;
-  });
   // biome-ignore lint/style/useConst: svelte variable
   let hoveredTab = $state("");
-  let selectedFile: string | null = $state(null)
+  let selectedFile: string | null = $state(null);
 
   function closeSidebar(isCurrentTab: boolean, newTab: string) {
     isOpen = isCurrentTab ? !isOpen : true;
@@ -68,34 +63,51 @@
     const newArray = tabs.filter((_, i) => i !== tabIndex);
 
     tabs = newArray;
-    console.log(tabIndex )
-    console.log(tabIndex - 1 < 0 ? 0 : tabIndex - 1)
-    activeTab = tabIndex - 1 < 0 ? 0 : tabIndex - 1;
+    if (activeTab >= newArray.length) {
+      const newIndex = newArray.length - 1;
+      activeTab = newIndex;
+      activeTabContent = newArray[newIndex].content;
+    }
   }
 
   function openFile(e: string) {
     if (selectedFile === e) {
-      selectedFile = null
-      const directoryAndFileNames = e.split("-")
+      selectedFile = null;
+      const directoryAndFileNames = e.split("-");
 
-      const fileHasATab = tabs.some(item => item.directory === directoryAndFileNames[0] && item.fileName === directoryAndFileNames[1])
+      const fileHasATab = tabs.some(
+        (item) =>
+          item.directory === directoryAndFileNames[0] &&
+          item.fileName === directoryAndFileNames[1],
+      );
 
       if (fileHasATab) {
-        const indexOfFiletab = tabs.findIndex(item => item.directory === directoryAndFileNames[0] && item.fileName === directoryAndFileNames[1])
+        const indexOfFiletab = tabs.findIndex(
+          (item) =>
+            item.directory === directoryAndFileNames[0] &&
+            item.fileName === directoryAndFileNames[1],
+        );
 
-        activeTab = indexOfFiletab
+        activeTab = indexOfFiletab;
       } else {
         tabs.push({
           directory: directoryAndFileNames[0],
           fileName: directoryAndFileNames[1],
-          content: `content for the ${directoryAndFileNames[1]} file in directory ${directoryAndFileNames[0]}`
-        })
+          content: `content for the ${directoryAndFileNames[1]} file in directory ${directoryAndFileNames[0]}`,
+        });
 
-        activeTab = tabs.length - 1
+        const newTabIndex = tabs.length - 1;
+        activeTab = newTabIndex;
+        activeTabContent = tabs[newTabIndex].content;
       }
     } else {
-      selectedFile = e
+      selectedFile = e;
     }
+  }
+
+  function changeTab(e: number) {
+    activeTab = e;
+    activeTabContent = tabs[e].content;
   }
 
   onMount(() => {
@@ -175,11 +187,7 @@
       style={`display: ${isOpen ? "block" : "none"}`}
     >
       {#if activeBar == "files"}
-        <FileExplorerBar
-          directories={files}
-          openFile={openFile}
-          selectedFile={selectedFile}
-        />
+        <FileExplorerBar directories={files} {openFile} {selectedFile} />
       {:else if activeBar == "deploy"}
         <DeployBar />
       {/if}
@@ -187,23 +195,21 @@
 
     <Col>
       <Row class="border border-1">
-        <TabContent on:tab={(e) => (activeTab = Number(e.detail))}>
+        <TabContent on:tab={(e) => changeTab(Number(e.detail))}>
           {#if tabs.length > 0}
             {#each tabs as tab, i}
               <EditorTabComp {activeTab} {hoveredTab} {i} {tab} {closeTab} />
             {/each}
-          {:else }
+          {:else}
             <TabPane active tabId={"Home"}>
-              <span slot="tab">
-                Home
-              </span>
+              <span slot="tab"> Home </span>
             </TabPane>
           {/if}
         </TabContent>
       </Row>
       <Row>
         {#if tabs.length > 0}
-          <Editor tabsContent={activeTabContent} activeTab={activeTab} />
+          <Editor tabsContent={activeTabContent} />
         {:else}
           <HomeTab />
         {/if}

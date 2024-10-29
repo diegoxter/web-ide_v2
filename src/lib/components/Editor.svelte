@@ -10,8 +10,7 @@
   import type * as Ace from "ace-builds";
 
   // biome-ignore lint/style/useConst: svelte variable
-  let { tabsContent, activeTab }: { tabsContent: string[]; activeTab: number } =
-    $props();
+  let { tabsContent }: { tabsContent: string | null } = $props();
   let scriptLoaded = $state(false);
   let ace: typeof Ace | null = $state(null);
 
@@ -63,13 +62,8 @@
         registerSnippets(ace, "lua", createSnippets(snippets));
       }, 3000);
 
-      if (tabsContent.length > 0) {
-        console.log(tabsContent)
-        console.log(activeTab)
-        const session = ace.createEditSession(
-          tabsContent[activeTab],
-          "ace/mode/lua",
-        );
+      if (tabsContent !== null) {
+        const session = ace.createEditSession(tabsContent, "ace/mode/lua");
         editor.setSession(session);
       }
     }

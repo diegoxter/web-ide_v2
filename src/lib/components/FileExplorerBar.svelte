@@ -38,16 +38,18 @@
 {#each (directories as DBDirectoryEntry[]) as directory}
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div class="folder" onclick={() => handleDirectoryClick(directory.name)} >
+  <div
+    class="folder"
+    onclick={() => handleDirectoryClick(directory.name)} 
+    style:background={isOpen.includes(directory.name)? "#333232a6":""}
+    style:color={isOpen.includes(directory.name)? "white":""}
+  >
     <Icon
       name={isOpen.includes(directory.name) ? "folder2-open" : "folder"}
       style="cursor: pointer;"
     />
     &nbsp;
-    <span
-      style:background={isOpen.includes(directory.name)? "#333232a6":""}
-      style:color={isOpen.includes(directory.name)? "white":""}
-    >
+    <span>
       {directory.name}
     </span>
   </div>
@@ -77,7 +79,7 @@
   li {
     list-style-type: none;
     padding-inline-start: 0.8rem;
-
+    border-radius: 6px;
     user-select: none;
   }
 
@@ -87,21 +89,13 @@
     padding-inline-start: 0;
     user-select: none;
     cursor:default;
-
-    span {
-      border: 1px solid white;
-      border-radius: 6px;
-      padding: 0 6px;
-    }
-
+    border: 1px solid white;
+    border-radius: 6px;
+    padding: 0 6px;
 
     &:hover {
-      span {
-        background: #595959;
-        color: white;
-      }
+      background: #595959;
+      color: white;
     }
   }
-
-  
 </style>

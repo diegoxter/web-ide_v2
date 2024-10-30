@@ -1,35 +1,35 @@
 <script lang="ts">
-import { Icon } from "@sveltestrap/sveltestrap";
-import Tooltip from "./Tooltip.svelte";
+  import { Icon } from "@sveltestrap/sveltestrap";
+  import Tooltip from "./Tooltip.svelte";
 
-interface FileToolbarButtonData {
-  icon: string;
-  tip: string;
-  id: string;
-}
+  interface FileToolbarButtonData {
+    icon: string;
+    tip: string;
+    id: string;
+  }
 
-const buttons = [
-  //{
-  //  icon: "file-earmark",
-  //  tip: "Create File",
-  //  id: "create-file",
-  //},
-  //{
-  //  icon: "folder",
-  //  tip: "Create Folder",
-  //  id: "create-folder",
-  //},
-  {
-    icon: "file-arrow-up",
-    tip: "Upload file",
-    id: "upload-file",
-  },
-  {
-    icon: "upload",
-    tip: "Upload folder",
-    id: "upload-folder",
-  },
-];
+  const buttons = [
+    //{
+    //  icon: "file-earmark",
+    //  tip: "Create File",
+    //  id: "create-file",
+    //},
+    //{
+    //  icon: "folder",
+    //  tip: "Create Folder",
+    //  id: "create-folder",
+    //},
+    {
+      icon: "file-arrow-up",
+      tip: "Upload file",
+      id: "upload-file",
+    },
+    {
+      icon: "upload",
+      tip: "Upload folder",
+      id: "upload-folder",
+    },
+  ];
 </script>
 
 {#snippet fileButton(buttonData: FileToolbarButtonData, i: number)}

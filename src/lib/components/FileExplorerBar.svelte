@@ -1,66 +1,70 @@
 <script lang="ts">
-import { Icon } from "@sveltestrap/sveltestrap";
-import FExpToolbar from "./FExpToolbar.svelte";
-import Tooltip from "./Tooltip.svelte";
+  import { Icon } from "@sveltestrap/sveltestrap";
+  import FExpToolbar from "./FExpToolbar.svelte";
+  import Tooltip from "./Tooltip.svelte";
 
-// biome-ignore lint/style/useConst: svelte variable
-let hoveredDirectory: string | null = $state(null);
-// biome-ignore lint/style/useConst: svelte variable
-let hoveredFile: string | null = $state(null);
-// biome-ignore lint/style/useConst: svelte variable
-let {
-  directories,
-  handleNewFile,
-  handleRenameFile,
-  handleDeleteFile,
-  openFile,
-  selectedFile,
-}: { directories: DBDirectoryEntry[]; handleNewFile: (type: string, elem: DBDirectoryEntry | FileEntry)=> void; 
-  handleRenameFile: (type: string, elem: DBDirectoryEntry | FileEntry)=> void;
-  handleDeleteFile: (type: string, elem: DBDirectoryEntry | FileEntry)=> void;
-  openFile: (e: HTMLElement) => void; selectedFile: string | null } =
-  $props();
+  // biome-ignore lint/style/useConst: svelte variable
+  let hoveredDirectory: string | null = $state(null);
+  // biome-ignore lint/style/useConst: svelte variable
+  let hoveredFile: string | null = $state(null);
+  // biome-ignore lint/style/useConst: svelte variable
+  let {
+    directories,
+    handleNewFile,
+    handleRenameFile,
+    handleDeleteFile,
+    openFile,
+    selectedFile,
+  }: {
+      directories: DBDirectoryEntry[];
+      handleNewFile: (type: string, elem: DBDirectoryEntry | FileEntry)=> void;
+      handleRenameFile: (type: string, elem: DBDirectoryEntry | FileEntry)=> void;
+      handleDeleteFile: (type: string, elem: DBDirectoryEntry | FileEntry)=> void;
+      openFile: (e: HTMLElement) => void;
+      selectedFile: string | null
+    } = $props();
 
-let isOpen: string[] = $state([]);
+  let isOpen: string[] = $state([]);
 
-function handleDirectoryClick(directoryName: string) {
-  if (isOpen.includes(directoryName)) {
-    const newArray = isOpen.filter((name) => name !== directoryName);
-    isOpen = newArray;
-  } else {
-    isOpen.push(directoryName);
-  }
-}
-
-function returnLiBackground(fileName: string, directoryName: string) {
-  if (hoveredFile === fileName) {
-    return "#858585a6";
+  function handleDirectoryClick(directoryName: string) {
+    if (isOpen.includes(directoryName)) {
+      const newArray = isOpen.filter((name) => name !== directoryName);
+      isOpen = newArray;
+    } else {
+      isOpen.push(directoryName);
+    }
   }
 
-  const thisFile = `${directoryName}-${fileName}`;
-  if (selectedFile === thisFile) {
-    return "#b7b7b785";
-  }
-}
+  function returnLiBackground(fileName: string, directoryName: string) {
+    if (hoveredFile === fileName) {
+      return "#858585a6";
+    }
 
-const fileOperationButtons = [
-  {
-    icon: "file-earmark",
-    name: "Create new file",
-    handler: handleNewFile,
-  },
-  {
-    icon: "trash2",
-    name: "Delete",
-    handler: handleDeleteFile,
-  },
-  {
-    icon: "pencil-fill",
-    name: "Rename",
-    handler: handleRenameFile,
-  },
-];
+    const thisFile = `${directoryName}-${fileName}`;
+    if (selectedFile === thisFile) {
+      return "#b7b7b785";
+    }
+  }
+
+  const fileOperationButtons = [
+    {
+      icon: "file-earmark",
+      name: "Create new file",
+      handler: handleNewFile,
+    },
+    {
+      icon: "trash2",
+      name: "Delete",
+      handler: handleDeleteFile,
+    },
+    {
+      icon: "pencil-fill",
+      name: "Rename",
+      handler: handleRenameFile,
+    },
+  ];
 </script>
+
 {#snippet fileOperationButton(icon: string, text: string, clickHandler: (type: string, elem: DBDirectoryEntry | FileEntry)=> void, index: number, element: DBDirectoryEntry | FileEntry, type: string)}
   <button
     type="button"

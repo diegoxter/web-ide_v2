@@ -1,7 +1,6 @@
 <script lang="ts">
-  // biome-ignore lint/style/useConst: svelte variable
-  let { tooltipText, index }: { tooltipText: string; index: number | string } =
-    $props();
+// biome-ignore lint/style/useConst: svelte variable
+let { tooltipText, index }: { tooltipText: string; index: number | string } = $props();
 </script>
 
 <span class={`tooltiptext-${index}`}>{tooltipText}</span>

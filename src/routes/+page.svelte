@@ -1,176 +1,171 @@
 <script lang="ts">
-  import {
-    Container,
-    Col,
-    Icon,
-    Nav,
-    NavItem,
-    NavLink,
-    Row,
-    TabContent,
-    TabPane,
-  } from "@sveltestrap/sveltestrap";
-  import {
-    Editor,
-    EditorTabComp,
-    DeployBar,
-    FileExplorerBar,
-    HomeTab,
-    openDatabase,
-    listDirectoriesWithFiles,
-    addDirectory,
-    addFile,
-    script,
-  } from "$lib";
-  import { onMount } from "svelte";
+import {
+  Container,
+  Col,
+  Icon,
+  Nav,
+  NavItem,
+  NavLink,
+  Row,
+  TabContent,
+  TabPane,
+} from "@sveltestrap/sveltestrap";
+import {
+  Editor,
+  EditorTabComp,
+  DeployBar,
+  FileExplorerBar,
+  HomeTab,
+  openDatabase,
+  listDirectoriesWithFiles,
+  addDirectory,
+  addFile,
+  script,
+} from "$lib";
+import { onMount } from "svelte";
 
-  let isOpen: boolean = $state(true);
-  let files: DBDirectoryEntry[] = $state([]);
-  let activeBar: string = $state("files");
-  let db: IDBDatabase | null = $state(null);
+let isOpen: boolean = $state(true);
+let files: DBDirectoryEntry[] = $state([]);
+let activeBar: string = $state("files");
+let db: IDBDatabase | null = $state(null);
 
-  // biome-ignore lint/style/useConst: svelte variable
-  let links = [
-    {
-      path: "files",
-      icon: "files",
-    },
-    {
-      path: "deploy",
-      icon: "plugin",
-    },
-  ];
+// biome-ignore lint/style/useConst: svelte variable
+let links = [
+  {
+    path: "files",
+    icon: "files",
+  },
+  {
+    path: "deploy",
+    icon: "plugin",
+  },
+];
 
-  let tabs: EditorTab[] = $state([
-    //{ directory: "", fileName: "tab name 1", content: "file 1" },
-    //{ directory: "", fileName: "tab name 2", content: "file 2" },
-  ]);
+let tabs: EditorTab[] = $state([
+  //{ directory: "", fileName: "tab name 1", content: "file 1" },
+  //{ directory: "", fileName: "tab name 2", content: "file 2" },
+]);
 
-  let activeTab: number = $state(0);
-  // biome-ignore lint/style/useConst: svelte variable
-  let activeTabContent: string | null = $state(null);
-  // biome-ignore lint/style/useConst: svelte variable
-  let hoveredTab = $state("");
-  let selectedFile: string | null = $state(null);
+let activeTab: number = $state(0);
+let activeTabContent: string | null = $state(null);
+// biome-ignore lint/style/useConst: svelte variable
+let hoveredTab = $state("");
+let selectedFile: string | null = $state(null);
 
-  function closeSidebar(isCurrentTab: boolean, newTab: string) {
-    isOpen = isCurrentTab ? !isOpen : true;
-    activeBar = newTab;
+function closeSidebar(isCurrentTab: boolean, newTab: string) {
+  isOpen = isCurrentTab ? !isOpen : true;
+  activeBar = newTab;
+}
+
+function closeTab(tabIndex: number) {
+  const newArray = tabs.filter((_, i) => i !== tabIndex);
+
+  tabs = newArray;
+  if (activeTab >= newArray.length && newArray.length !== 0) {
+    const newIndex = newArray.length - 1;
+    activeTab = newIndex;
+    activeTabContent = newArray[newIndex].content;
   }
+}
 
-  function closeTab(tabIndex: number) {
-    const newArray = tabs.filter((_, i) => i !== tabIndex);
+function openFile(e: string) {
+  if (selectedFile === e) {
+    selectedFile = null;
+    const directoryAndFileNames = e.split("-");
+    const fileHasATab = tabs.some(
+      (item) =>
+        item.directory === directoryAndFileNames[0] && item.fileName === directoryAndFileNames[1],
+    );
 
-    tabs = newArray;
-    if (activeTab >= newArray.length && newArray.length !== 0) {
-      const newIndex = newArray.length - 1;
-      activeTab = newIndex;
-      activeTabContent = newArray[newIndex].content;
-    }
-  }
-
-  function openFile(e: string) {
-    if (selectedFile === e) {
-      selectedFile = null;
-      const directoryAndFileNames = e.split("-");
-
-      const fileHasATab = tabs.some(
+    if (fileHasATab) {
+      const indexOfFiletab = tabs.findIndex(
         (item) =>
-          item.directory === directoryAndFileNames[0] &&
-          item.fileName === directoryAndFileNames[1],
+          item.directory === directoryAndFileNames[0] && item.fileName === directoryAndFileNames[1],
       );
 
-      if (fileHasATab) {
-        const indexOfFiletab = tabs.findIndex(
-          (item) =>
-            item.directory === directoryAndFileNames[0] &&
-            item.fileName === directoryAndFileNames[1],
-        );
-
-        activeTab = indexOfFiletab;
-      } else {
-        const fileContent = files.map((directory) => {
-          let fileCntnt;
-          if (directory.name === directoryAndFileNames[0]) {
-            fileCntnt = directory.files.map((file) => {
-              if (file.name === directoryAndFileNames[1]) {
-                return file.content;
-              }
-            });
-          }
-
-          return fileCntnt![0];
-        });
-
-        tabs.push({
-          directory: directoryAndFileNames[0],
-          fileName: directoryAndFileNames[1],
-          content: fileContent[0] as string,
-        });
-
-        const newTabIndex = tabs.length - 1;
-        activeTab = newTabIndex;
-        activeTabContent = tabs[newTabIndex].content;
-      }
+      activeTab = indexOfFiletab;
     } else {
-      selectedFile = e;
-    }
-  }
-
-  function changeTab(e: number) {
-    console.log("clicked tab: ", e);
-    if (e !== activeTab && tabs.length > 0) {
-      console.log("tab changed!");
-      activeTab = e;
-      //activeTabContent = tabs[e].content;
-    }
-  }
-
-  onMount(() => {
-    if (window && db == null) {
-      openDatabase()
-        .then((_db: IDBDatabase | null) => {
-          if (!_db) {
-            return;
-          }
-          db = _db;
-
-          const transaction = db.transaction(["files"], "readonly");
-          const store = transaction.objectStore("files");
-          const request = store.openCursor();
-          request.onsuccess = (event) => {
-            const cursor = (event.target as IDBRequest<IDBCursor | null>)
-              .result;
-            if (!cursor) {
-              addDirectory(db as IDBDatabase, "contracts").then(() =>
-                addFile(db as IDBDatabase, 1, "test.lua", script).then(() => {
-                  listDirectoriesWithFiles(db as IDBDatabase).then((res) => {
-                    files = res;
-                  });
-                }),
-              );
+      const fileContent = files.map((directory) => {
+        let fileCntnt: (string | undefined)[] = [""];
+        if (directory.name === directoryAndFileNames[0]) {
+          fileCntnt = directory.files.map((file) => {
+            if (file.name === directoryAndFileNames[1]) {
+              return file.content;
             }
-          };
+          });
+        }
 
-          request.onerror = (event) => {
-            console.error(
-              "Error al verificar la existencia de entradas:",
-              (event.target as IDBRequest).error,
-            );
-          };
-        })
-        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-        .catch((err: any) => console.error(err));
-    }
-  });
-
-  $effect(() => {
-    if (db && files.length === 0) {
-      listDirectoriesWithFiles(db).then((res) => {
-        files = res;
+        return fileCntnt?.[0];
       });
+
+      tabs.push({
+        directory: directoryAndFileNames[0],
+        fileName: directoryAndFileNames[1],
+        content: fileContent[0] as string,
+      });
+
+      const newTabIndex = tabs.length - 1;
+      activeTab = newTabIndex;
+      activeTabContent = tabs[newTabIndex].content;
     }
-  });
+  } else {
+    selectedFile = e;
+  }
+}
+
+function changeTab(e: number) {
+  console.log("clicked tab: ", e);
+  if (e !== activeTab && tabs.length > 0) {
+    console.log("tab changed!");
+    activeTab = e;
+    //activeTabContent = tabs[e].content;
+  }
+}
+
+onMount(() => {
+  if (window && db == null) {
+    openDatabase()
+      .then((_db: IDBDatabase | null) => {
+        if (!_db) {
+          return;
+        }
+        db = _db;
+
+        const transaction = db.transaction(["files"], "readonly");
+        const store = transaction.objectStore("files");
+        const request = store.openCursor();
+        request.onsuccess = (event) => {
+          const cursor = (event.target as IDBRequest<IDBCursor | null>).result;
+          if (!cursor) {
+            addDirectory(db as IDBDatabase, "contracts").then(() =>
+              addFile(db as IDBDatabase, 1, "test.lua", script).then(() => {
+                listDirectoriesWithFiles(db as IDBDatabase).then((res) => {
+                  files = res;
+                });
+              }),
+            );
+          }
+        };
+
+        request.onerror = (event) => {
+          console.error(
+            "Error al verificar la existencia de entradas:",
+            (event.target as IDBRequest).error,
+          );
+        };
+      })
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      .catch((err: any) => console.error(err));
+  }
+});
+
+$effect(() => {
+  if (db && files.length === 0) {
+    listDirectoriesWithFiles(db).then((res) => {
+      files = res;
+    });
+  }
+});
 </script>
 
 <Container fluid style="height: 100vmin">

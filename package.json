@@ -9,7 +9,8 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "format:check": "biome format ./src",
-    "format:write": "biome format --write ./src"
+    "format:write": "biome format --write ./src",
+    "linter:check": "biome lint --error-on-warnings ./src"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",

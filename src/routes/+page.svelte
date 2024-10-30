@@ -72,7 +72,6 @@
     if (e.className === "bi-trash2" || e.className === "bi-pencil-fill") {
       return;
     }
-
     const element = e.id;
 
     if (selectedFile === element) {
@@ -93,24 +92,20 @@
 
         activeTab = indexOfFiletab;
       } else {
-        const fileContent = files.map((directory) => {
-          let fileCntnt: (string | undefined)[] = [""];
-          if (directory.name === directoryAndFileNames[0]) {
-            fileCntnt = directory.files.map((file) => {
-              if (file.name === directoryAndFileNames[1]) {
-                return file.content;
-              }
-            });
-          }
+        const selectedDir = files.find(
+          (directory) => directory.name === directoryAndFileNames[0],
+        );
+        const selectedFile = selectedDir!.files.find(
+          (file) => file.name === directoryAndFileNames[1],
+        );
 
-          return fileCntnt?.[0];
-        });
-
-        tabs.push({
+        const newTabContent = {
           directory: directoryAndFileNames[0],
           fileName: directoryAndFileNames[1],
-          content: fileContent[0] as string,
-        });
+          content: selectedFile!.content,
+        };
+
+        tabs.push(newTabContent);
 
         const newTabIndex = tabs.length - 1;
         activeTab = newTabIndex;
@@ -128,6 +123,43 @@
       activeTab = e;
       activeTabContent = tabs[e].content;
     }
+  }
+
+  function handleNewFile(type: string, elem: DBDirectoryEntry | FileEntry) {
+    if (type === "file") {
+      console.log("newFile! ", type);
+    } else {
+      console.log("newDirectory! ", type);
+      const directoryIndex = files.findIndex(
+        (directory) => directory.name === elem.name && directory.id === elem.id,
+      );
+
+      files[directoryIndex].files.push({
+        name: "new file.lua",
+        content: "new file content",
+        id: 99,
+        directoryId: files[directoryIndex].id,
+      });
+    }
+  }
+
+  function handleDeleteFile(type: string, elem: DBDirectoryEntry | FileEntry) {
+    if (type === "file") {
+      console.log("deleteFile! ", type);
+    } else {
+      console.log("deleteDirectory! ", type);
+    }
+
+    console.log($state.snapshot(elem));
+  }
+
+  function handleRenameFile(type: string, elem: DBDirectoryEntry | FileEntry) {
+    if (type === "file") {
+      console.log("renameFile! ", type);
+    } else {
+      console.log("renameDirectory! ", type);
+    }
+    console.log($state.snapshot(elem));
   }
 
   onMount(() => {
@@ -207,7 +239,14 @@
       style={`display: ${isOpen ? "block" : "none"}`}
     >
       {#if activeBar == "files"}
-        <FileExplorerBar directories={files} {openFile} {selectedFile} />
+        <FileExplorerBar
+          directories={files}
+          {handleNewFile}
+          {handleRenameFile}
+          {handleDeleteFile}
+          {openFile}
+          {selectedFile}
+        />
       {:else if activeBar == "deploy"}
         <DeployBar />
       {/if}

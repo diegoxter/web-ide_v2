@@ -25,6 +25,7 @@ declare global {
   interface DBDirectoryEntry {
     name: string;
     files: FileEntry[];
+    id: number;
   }
 }
 

@@ -10,9 +10,15 @@ let hoveredFile: string | null = $state(null);
 // biome-ignore lint/style/useConst: svelte variable
 let {
   directories,
+  handleNewFile,
+  handleRenameFile,
+  handleDeleteFile,
   openFile,
   selectedFile,
-}: { directories: DBDirectoryEntry[]; openFile: (e: HTMLElement) => void; selectedFile: string | null } =
+}: { directories: DBDirectoryEntry[]; handleNewFile: (type: string, elem: DBDirectoryEntry | FileEntry)=> void; 
+  handleRenameFile: (type: string, elem: DBDirectoryEntry | FileEntry)=> void;
+  handleDeleteFile: (type: string, elem: DBDirectoryEntry | FileEntry)=> void;
+  openFile: (e: HTMLElement) => void; selectedFile: string | null } =
   $props();
 
 let isOpen: string[] = $state([]);
@@ -35,34 +41,6 @@ function returnLiBackground(fileName: string, directoryName: string) {
   if (selectedFile === thisFile) {
     return "#b7b7b785";
   }
-}
-
-function handleNewFile(type: string, elem: DBDirectoryEntry | FileEntry) {
-  if (type === "file") {
-    console.log("newFile! ", type);
-  } else {
-    console.log("newDirectory! ", type);
-  }
-  console.log($state.snapshot(elem));
-}
-
-function handleDeleteFile(type: string, elem: DBDirectoryEntry | FileEntry) {
-  if (type === "file") {
-    console.log("deleteFile! ", type);
-  } else {
-    console.log("deleteDirectory! ", type);
-  }
-
-  console.log($state.snapshot(elem));
-}
-
-function handleRenameFile(type: string, elem: DBDirectoryEntry | FileEntry) {
-   if (type === "file") {
-      console.log("renameFile! ", type);
-   } else {
-     console.log("renameDirectory! ", type);
-   }
-  console.log($state.snapshot(elem));
 }
 
 const fileOperationButtons = [

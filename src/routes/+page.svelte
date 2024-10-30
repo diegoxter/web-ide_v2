@@ -69,7 +69,6 @@
   }
 
   function openFile(e: HTMLElement) {
-    console.log(e);
     if (e.className === "bi-trash2" || e.className === "bi-pencil-fill") {
       return;
     }
@@ -127,7 +126,7 @@
     if (e !== activeTab && tabs.length > 0) {
       console.log("tab changed!");
       activeTab = e;
-      //activeTabContent = tabs[e].content;
+      activeTabContent = tabs[e].content;
     }
   }
 
@@ -216,10 +215,17 @@
 
     <Col>
       <Row class="border border-1">
-        <TabContent on:tab={(e) => changeTab(Number(e.detail))}>
+        <TabContent>
           {#if tabs.length > 0}
             {#each tabs as tab, i}
-              <EditorTabComp {activeTab} {hoveredTab} {i} {tab} {closeTab} />
+              <EditorTabComp
+                {activeTab}
+                {hoveredTab}
+                {i}
+                {tab}
+                {changeTab}
+                {closeTab}
+              />
             {/each}
           {:else}
             <TabPane active tabId={"Home"}>

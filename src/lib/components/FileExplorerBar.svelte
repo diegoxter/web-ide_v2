@@ -12,7 +12,7 @@ let {
   directories,
   openFile,
   selectedFile,
-}: { directories: DBDirectoryEntry[]; openFile: (e: string) => void; selectedFile: string | null } =
+}: { directories: DBDirectoryEntry[]; openFile: (e: HTMLElement) => void; selectedFile: string | null } =
   $props();
 
 let isOpen: string[] = $state([]);
@@ -38,17 +38,30 @@ function returnLiBackground(fileName: string, directoryName: string) {
 }
 
 function handleNewFile(type: string, elem: DBDirectoryEntry | FileEntry) {
-  console.log("newFile! ", type);
+  if (type === "file") {
+    console.log("newFile! ", type);
+  } else {
+    console.log("newDirectory! ", type);
+  }
   console.log($state.snapshot(elem));
 }
 
 function handleDeleteFile(type: string, elem: DBDirectoryEntry | FileEntry) {
-  console.log("deleteFile! ", type);
+  if (type === "file") {
+    console.log("deleteFile! ", type);
+  } else {
+    console.log("deleteDirectory! ", type);
+  }
+
   console.log($state.snapshot(elem));
 }
 
 function handleRenameFile(type: string, elem: DBDirectoryEntry | FileEntry) {
-  console.log("renameFile! ", type);
+   if (type === "file") {
+      console.log("renameFile! ", type);
+   } else {
+     console.log("renameDirectory! ", type);
+   }
   console.log($state.snapshot(elem));
 }
 
@@ -127,7 +140,7 @@ const fileOperationButtons = [
           id={`${directory.name}-${file.name}`}
           onmouseenter={() => hoveredFile = file.name}
           onmouseleave={() => hoveredFile = null}
-          onclick={(e) => {openFile((e.target as HTMLElement).id)}}
+          onclick={(e) => {openFile(e.target as HTMLElement)}}
           style:background={returnLiBackground(file.name, directory.name)}
         >
           <span id={`${directory.name}-${file.name}`}>
@@ -135,7 +148,7 @@ const fileOperationButtons = [
             {file.name}
           </span>
 
-          <div>
+          <div id="file-buttons">
             {#if hoveredFile === file.name}
               {#each fileOperationButtons as btnData, i}
                 {#if i > 0}

@@ -1,28 +1,28 @@
 <script lang="ts">
-  import { TabPane, Icon } from "@sveltestrap/sveltestrap";
+import { TabPane, Icon } from "@sveltestrap/sveltestrap";
 
-  // biome-ignore lint/style/useConst: svelte variable
-  let {
-    activeTab,
-    hoveredTab,
-    tab,
-    i,
-    closeTab,
-  }: {
-    activeTab: number;
-    hoveredTab: string;
-    i: number;
-    tab: EditorTab;
-    closeTab: (i: number) => void;
-  } = $props();
+// biome-ignore lint/style/useConst: svelte variable
+let {
+  activeTab,
+  hoveredTab,
+  tab,
+  i,
+  closeTab,
+}: {
+  activeTab: number;
+  hoveredTab: string;
+  i: number;
+  tab: EditorTab;
+  closeTab: (i: number) => void;
+} = $props();
 
-  function handleTabHover(isTabActive: boolean, isHovered: boolean) {
-    if (isTabActive) {
-      return "block";
-    }
-
-    return isHovered ? "block" : "none";
+function handleTabHover(isTabActive: boolean, isHovered: boolean) {
+  if (isTabActive) {
+    return "block";
   }
+
+  return isHovered ? "block" : "none";
+}
 </script>
 
 <TabPane tabId={i} active={activeTab == i}>

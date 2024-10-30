@@ -7,35 +7,30 @@ import EditorTabComp from "./components/EditorTabComp.svelte";
 import HomeTab from "./components/HomeTab.svelte";
 
 import {
-	doLiveAutocomplete,
-	myCompleter,
-	snippets,
-	createSnippets,
-	registerSnippets,
-	script,
+  doLiveAutocomplete,
+  myCompleter,
+  snippets,
+  createSnippets,
+  registerSnippets,
+  script,
 } from "./lua_autocomplete";
 
-import {
-	openDatabase,
-	listDirectoriesWithFiles,
-	addFile,
-	addDirectory,
-} from "./db";
+import { openDatabase, listDirectoriesWithFiles, addFile, addDirectory } from "./db";
 
 export {
-	DeployBar,
-	FileExplorerBar,
-	Editor,
-	EditorTabComp,
-	doLiveAutocomplete,
+  DeployBar,
+  FileExplorerBar,
+  Editor,
+  EditorTabComp,
+  doLiveAutocomplete,
   HomeTab,
-	myCompleter,
-	snippets,
-	script,
-	createSnippets,
-	registerSnippets,
-	openDatabase,
-	listDirectoriesWithFiles,
-	addFile,
-	addDirectory,
+  myCompleter,
+  snippets,
+  script,
+  createSnippets,
+  registerSnippets,
+  openDatabase,
+  listDirectoriesWithFiles,
+  addFile,
+  addDirectory,
 };

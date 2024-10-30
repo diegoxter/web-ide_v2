@@ -1,4 +1,5 @@
 <script lang="ts">
+  // biome-ignore lint/style/useConst: svelte variable
   let { tooltipText, index }: { tooltipText: string; index: number | string } =
     $props();
 </script>

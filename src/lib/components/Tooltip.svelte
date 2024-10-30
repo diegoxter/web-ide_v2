@@ -1,5 +1,6 @@
 <script lang="ts">
-  let { tooltipText, index }: { tooltipText: string; index: number } = $props();
+  let { tooltipText, index }: { tooltipText: string; index: number | string } =
+    $props();
 </script>
 
 <span class={`tooltiptext-${index}`}>{tooltipText}</span>

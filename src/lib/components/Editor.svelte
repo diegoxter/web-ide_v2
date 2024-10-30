@@ -50,10 +50,11 @@
       editor.setShowPrintMargin(false);
 
       ace.config.loadModule("ace/ext/language_tools", (ext) => {
-        ext.addCompleter(myCompleter);
+        //ext.addCompleter(myCompleter);
         editor.setOptions({
           enableSnippets: true,
           enableBasicAutocompletion: true,
+          enableLiveAutocompletion: myCompleter,
         });
       });
       editor.commands.on("afterExec", doLiveAutocomplete);

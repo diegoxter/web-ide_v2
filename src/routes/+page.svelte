@@ -42,14 +42,13 @@
   ];
 
   let tabs: EditorTab[] = $state([
-    { directory: "", fileName: "tab name 1", content: "file 1" },
-    { directory: "", fileName: "tab name 2", content: "file 2" },
+    //{ directory: "", fileName: "tab name 1", content: "file 1" },
+    //{ directory: "", fileName: "tab name 2", content: "file 2" },
   ]);
 
   let activeTab: number = $state(0);
   // biome-ignore lint/style/useConst: svelte variable
   let activeTabContent: string | null = $state(null);
-
   // biome-ignore lint/style/useConst: svelte variable
   let hoveredTab = $state("");
   let selectedFile: string | null = $state(null);
@@ -63,7 +62,7 @@
     const newArray = tabs.filter((_, i) => i !== tabIndex);
 
     tabs = newArray;
-    if (activeTab >= newArray.length) {
+    if (activeTab >= newArray.length && newArray.length !== 0) {
       const newIndex = newArray.length - 1;
       activeTab = newIndex;
       activeTabContent = newArray[newIndex].content;
@@ -90,10 +89,23 @@
 
         activeTab = indexOfFiletab;
       } else {
+        const fileContent = files.map((directory) => {
+          let fileCntnt;
+          if (directory.name === directoryAndFileNames[0]) {
+            fileCntnt = directory.files.map((file) => {
+              if (file.name === directoryAndFileNames[1]) {
+                return file.content;
+              }
+            });
+          }
+
+          return fileCntnt![0];
+        });
+
         tabs.push({
           directory: directoryAndFileNames[0],
           fileName: directoryAndFileNames[1],
-          content: `content for the ${directoryAndFileNames[1]} file in directory ${directoryAndFileNames[0]}`,
+          content: fileContent[0] as string,
         });
 
         const newTabIndex = tabs.length - 1;
@@ -106,8 +118,12 @@
   }
 
   function changeTab(e: number) {
-    activeTab = e;
-    activeTabContent = tabs[e].content;
+    console.log("clicked tab: ", e);
+    if (e !== activeTab && tabs.length > 0) {
+      console.log("tab changed!");
+      activeTab = e;
+      //activeTabContent = tabs[e].content;
+    }
   }
 
   onMount(() => {

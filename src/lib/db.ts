@@ -6,6 +6,7 @@ interface FileEntry {
 }
 
 interface DBDirectoryEntry {
+	id: number;
 	name: string;
 	files: FileEntry[];
 }
@@ -131,7 +132,11 @@ export async function listDirectoriesWithFiles(
 				const dirId = cursor.value.id;
 				const dirName = cursor.value.name;
 
-				const currentDirectory: DBDirectoryEntry = { name: dirName, files: [] };
+				const currentDirectory: DBDirectoryEntry = {
+					name: dirName,
+					files: [],
+					id: dirId,
+				};
 				const fileRequest = fileStore
 					.index("directory_name")
 					.getAll(IDBKeyRange.bound([dirId, ""], [dirId, "\uffff"]));

@@ -26,7 +26,11 @@
 
   let isOpen: string[] = $state([]);
 
-  function handleDirectoryClick(directoryName: string) {
+  function handleDirectoryClick(directoryName: string, e: HTMLElement) {
+    if (e.className === "bi-trash2" || e.className === "bi-pencil-fill" || e.className === "bi-file-earmark") {
+      return;
+    }
+
     if (isOpen.includes(directoryName)) {
       const newArray = isOpen.filter((name) => name !== directoryName);
       isOpen = newArray;
@@ -88,7 +92,7 @@
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class="folder"
-    onclick={() => handleDirectoryClick(directory.name)}
+    onclick={(e) => handleDirectoryClick(directory.name, e.target as HTMLElement)}
     onmouseenter={() => hoveredDirectory = directory.name}
     onmouseleave={() => hoveredDirectory = null}
     style:background={isOpen.includes(directory.name)? "#333232a6":""}

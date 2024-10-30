@@ -59,9 +59,12 @@
 
   function closeTab(tabIndex: number) {
     const newArray = tabs.filter((_, i) => i !== tabIndex);
-
     tabs = newArray;
-    if (activeTab >= newArray.length && newArray.length !== 0) {
+
+    if (
+      (activeTab >= newArray.length && newArray.length !== 0) ||
+      (newArray.length === 1 && activeTab === 0)
+    ) {
       const newIndex = newArray.length - 1;
       activeTab = newIndex;
       activeTabContent = newArray[newIndex].content;

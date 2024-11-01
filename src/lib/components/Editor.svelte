@@ -49,7 +49,7 @@
       editor.session.setOptions({ tabSize: 2, useSoftTabs: true });
       editor.setShowPrintMargin(false);
 
-      ace.config.loadModule("ace/ext/language_tools", (ext) => {
+      ace.config.loadModule("ace/ext/language_tools", () => {
         //ext.addCompleter(myCompleter);
         editor.setOptions({
           enableSnippets: true,

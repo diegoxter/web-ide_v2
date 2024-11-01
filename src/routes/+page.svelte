@@ -51,6 +51,7 @@
   // biome-ignore lint/style/useConst: svelte variable
   let hoveredTab = $state("");
   let selectedFile: string | null = $state(null);
+  let oldRenamedName: string | null = $state(null);
 
   function closeSidebar(isCurrentTab: boolean, newTab: string) {
     isOpen = isCurrentTab ? !isOpen : true;
@@ -75,8 +76,8 @@
     if (e.className === "bi-trash2" || e.className === "bi-pencil-fill") {
       return;
     }
-    const element = e.id;
 
+    const element = e.id;
     if (selectedFile === element) {
       selectedFile = null;
       const directoryAndFileNames = element.split("-");
@@ -98,6 +99,8 @@
         const selectedDir = files.find(
           (directory) => directory.name === directoryAndFileNames[0],
         );
+
+        // biome-ignore lint/style/noNonNullAssertion: this file will always exist
         const selectedFile = selectedDir!.files.find(
           (file) => file.name === directoryAndFileNames[1],
         );
@@ -105,6 +108,7 @@
         const newTabContent = {
           directory: directoryAndFileNames[0],
           fileName: directoryAndFileNames[1],
+          // biome-ignore lint/style/noNonNullAssertion: this file will always exist
           content: selectedFile!.content,
         };
 
@@ -142,6 +146,7 @@
         content: "new file content",
         id: 99,
         directoryId: files[directoryIndex].id,
+        isEditing: false,
       });
     }
   }
@@ -156,13 +161,43 @@
     console.log($state.snapshot(elem));
   }
 
-  function handleRenameFile(type: string, elem: DBDirectoryEntry | FileEntry) {
-    if (type === "file") {
-      console.log("renameFile! ", type);
+  function handleRenameFile(_: string, elem: DBDirectoryEntry | FileEntry) {
+    elem.isEditing = !elem.isEditing;
+  }
+
+  function handleRenaming(
+    elem: DBDirectoryEntry | FileEntry,
+    e: KeyboardEvent,
+  ) {
+    oldRenamedName = elem.name;
+
+    if (e.key === "Enter") {
+      let existingNames: string[] = [""];
+
+      if ("files" in elem) {
+        existingNames = files.map((dir) => dir.name);
+      } else {
+        // biome-ignore lint/style/noNonNullAssertion: this file will always exist
+        const workingDir: DBDirectoryEntry = files.find(
+          (dir) => dir.id === elem.directoryId,
+        )!;
+        existingNames = workingDir.files.map((file) => file.name);
+      }
+
+      const stopEditing = () => {
+        oldRenamedName = null;
+        elem.isEditing = false;
+      };
+
+      if (elem.name === "" || existingNames.includes(elem.name)) {
+        elem.name = oldRenamedName;
+        stopEditing();
+      }
+
+      stopEditing();
     } else {
-      console.log("renameDirectory! ", type);
+      elem.name = (e.target as HTMLInputElement).value;
     }
-    console.log($state.snapshot(elem));
   }
 
   onMount(() => {
@@ -184,7 +219,10 @@
               addDirectory(db as IDBDatabase, "contracts").then(() =>
                 addFile(db as IDBDatabase, 1, "test.lua", script).then(() => {
                   listDirectoriesWithFiles(db as IDBDatabase).then((res) => {
-                    files = res;
+                    files = res.map((dbDirectory) => ({
+                      ...dbDirectory,
+                      isEditing: false,
+                    })) as DBDirectoryEntry[];
                   });
                 }),
               );
@@ -206,7 +244,10 @@
   $effect(() => {
     if (db && files.length === 0) {
       listDirectoriesWithFiles(db).then((res) => {
-        files = res;
+        files = res.map((dbDirectory) => ({
+          ...dbDirectory,
+          isEditing: false,
+        })) as DBDirectoryEntry[];
       });
     }
   });
@@ -247,6 +288,7 @@
           {handleNewFile}
           {handleRenameFile}
           {handleDeleteFile}
+          {handleRenaming}
           {openFile}
           {selectedFile}
         />

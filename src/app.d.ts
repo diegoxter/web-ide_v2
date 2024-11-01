@@ -16,16 +16,24 @@ declare global {
   }
 
   interface FileEntry {
+    id: number;
     name: string;
     content: string;
-    id: number;
     directoryId: number;
+    isEditing: boolean;
+  }
+
+  interface FileOperationButton {
+    icon: string;
+    name: string;
+    handler: (type: string, elem: DBDirectoryEntry | FileEntry) => void;
   }
 
   interface DBDirectoryEntry {
+    id: number;
     name: string;
     files: FileEntry[];
-    id: number;
+    isEditing: boolean;
   }
 }
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Icon } from "@sveltestrap/sveltestrap";
-  import Tooltip from "./Tooltip.svelte";
+  import Tooltip from "../Tooltip.svelte";
 
   interface FileToolbarButtonData {
     icon: string;
@@ -46,9 +46,9 @@
   {/snippet}
 
 <div class="toolbar border border-1">
-    {#each buttons as b, i}
-        {@render fileButton(b, i)}
-    {/each}
+  {#each buttons as b, i}
+    {@render fileButton(b, i)}
+  {/each}
 </div>
 
 <style>

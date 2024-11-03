@@ -22,14 +22,14 @@
     parentDirectoryName?: string | null;
     hoveredDirectory?: string | null;
     hoveredFile?: string | null;
-    openFile?: (e: HTMLElement) => void | null;
+    openFile?: (e: HTMLElement) => undefined | null;
     openDirectories?: string[] | null;
     fileOperationButtons: FileOperationButton[];
     handleDirectoryClick?: (
       directoryName: string,
       e: HTMLElement,
       isEditing: boolean
-    ) => void | null;
+    ) => undefined | null;
     fileOperationButton: (
       icon: string,
       text: string,
@@ -51,28 +51,33 @@
     ) => void;
   } = $props();
 
+  // biome-ignore lint/style/useConst: svelte variable
   let itemRef: HTMLElement | null = $state(null)
 
   onMount(() => {
     if (entryElem.isEditing) {
+      // biome-ignore lint/style/noNonNullAssertion: this ref will always exist
       itemRef!.focus()
     }
   })
 
   const returnEntryElemclickHandler = (e: Event | MouseEvent) => {
     if (fileType === "file") {
+      // biome-ignore lint/style/noNonNullAssertion: this function will always exist
       entryElem.isEditing? null : openFile!(e.target as HTMLElement)
     } else {
+      // biome-ignore lint/style/noNonNullAssertion: this function will always exist
       handleDirectoryClick!(entryElem.name, e.target as HTMLElement, entryElem.isEditing)
     }
   }
 
   const returnEntryElemBackground = () => {
     if (fileType === "file") {
+      // biome-ignore lint/style/noNonNullAssertion: this function will always exist
       return returnLiBackground!(entryElem.name, parentDirectoryName as string)
-    } else {
-      return openDirectories!.includes(entryElem.name)? "#333232a6":""
-    }
+    } 
+    // biome-ignore lint/style/noNonNullAssertion: this function will always exist
+    return openDirectories!.includes(entryElem.name)? "#333232a6":""
   }
 
   const returnEntryElemOnMouseEnter = () => {
@@ -88,25 +93,24 @@
       hoveredFile = null
     } else {
       hoveredDirectory = null
-      console.log("directory")
     }
   }
 
   const returnEntryElemIcon = () => {
     if (fileType === "file") {
       return "file-code"
-    } else {
-      return openDirectories!.includes(entryElem.name) ? "folder2-open" : "folder"
     }
+
+    // biome-ignore lint/style/noNonNullAssertion: this function will always exist
+    return openDirectories!.includes(entryElem.name) ? "folder2-open" : "folder"
   }
 
   const returnEntryElemFileOperationBoolean = () => {
     if (fileType === "file") {
       return hoveredFile === entryElem.name && !entryElem.isEditing
-    } else {
-      return hoveredDirectory === entryElem.name && !entryElem.isEditing
     }
 
+    return hoveredDirectory === entryElem.name && !entryElem.isEditing
   }
 </script>
 

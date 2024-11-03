@@ -21,13 +21,13 @@
     handleRenameFile: (type: string, elem: DBDirectoryEntry | FileEntry) => void;
     handleDeleteFile: (type: string, elem: DBDirectoryEntry | FileEntry) => void;
     handleRenaming: (elem: DBDirectoryEntry | FileEntry, e: KeyboardEvent) => void;
-    openFile: (e: HTMLElement) => void;
+    openFile: (e: HTMLElement) => undefined;
     openDirectories: string[];
     modifyOpenDirectories: (newArray: string[]) => void;
     selectedFile: string | null;
   } = $props();
 
-  
+
   // biome-ignore lint/style/useConst: svelte variable
   let hoveredDirectory: string | null = $state(null);
   // biome-ignore lint/style/useConst: svelte variable
@@ -54,6 +54,8 @@
 
       modifyOpenDirectories(newArray)
     }
+
+    return undefined
   }
 
   function returnLiBackground(fileName: string, directoryName: string) {

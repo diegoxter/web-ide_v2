@@ -76,7 +76,7 @@
 
   function openFile(e: HTMLElement) {
     if (e.className === "bi-trash2" || e.className === "bi-pencil-fill") {
-      return;
+      return undefined;
     }
 
     const element = e.id;
@@ -160,7 +160,9 @@
     });
   }
 
-  const isDBDirectoryEntry = (file: any): file is DBDirectoryEntry => {
+  const isDBDirectoryEntry = (
+    file: DBDirectoryEntry | FileEntry,
+  ): file is DBDirectoryEntry => {
     return "id" in file && "name" in file && !("directoryId" in file);
   };
 
@@ -170,6 +172,7 @@
         (dir) => dir.name !== file.name && dir.id !== file.id,
       );
     } else {
+      // biome-ignore lint/style/noNonNullAssertion: this file will always exist
       const workingDir: number = files.findIndex(
         (dir: DBDirectoryEntry) => dir.id === (file as FileEntry).directoryId,
       )!;

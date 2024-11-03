@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Icon } from "@sveltestrap/sveltestrap";
   import FExpToolbar from "./FExpToolbar.svelte";
-  import Directory from "./Directory.svelte";
   import File from "./File.svelte";
   import Tooltip from "../Tooltip.svelte";
 
@@ -106,12 +105,14 @@
 <FExpToolbar />
 
 {#each (directories as DBDirectoryEntry[]) as directory}
-  <Directory
-    {directory}
-    {handleDirectoryClick}
+
+  <File
+    entryElem={directory}
+    fileType={"directory"}
     {hoveredDirectory}
     {openDirectories}
     {fileOperationButtons}
+    {handleDirectoryClick}
     {fileOperationButton}
     {handleRenaming}
   />
@@ -119,11 +120,32 @@
   {#if openDirectories.includes(directory.name)}
     {#each directory.files as file}
       <File
-        {file}
-        {directory}
-        {hoveredFile} {openFile} {fileOperationButtons} {fileOperationButton} {returnLiBackground} {handleRenaming}/>
+        entryElem={file}
+        fileType={"file"}
+        parentDirectoryName={directory.name}
+        {hoveredFile}
+        {openFile}
+        {fileOperationButtons}
+        {fileOperationButton}
+        {returnLiBackground}
+        {handleRenaming}
+      />
     {/each}
   {/if}
 
 {/each}
 
+
+<style>
+.file-button {
+      border: 0;
+      background: local !important;
+      color: #aaaaaa;
+      padding: 0 1px;
+
+      &:hover {
+        background: #595959;
+        color: white;
+      }
+ }
+</style>

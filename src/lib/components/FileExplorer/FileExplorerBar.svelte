@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Icon } from "@sveltestrap/sveltestrap";
   import FExpToolbar from "./FExpToolbar.svelte";
-  import File from "./File.svelte";
+  import FEItem from "./FEItem.svelte";
   import Tooltip from "../Tooltip.svelte";
 
   // biome-ignore lint/style/useConst: svelte variable
@@ -106,7 +106,7 @@
 
 {#each (directories as DBDirectoryEntry[]) as directory}
 
-  <File
+  <FEItem
     entryElem={directory}
     fileType={"directory"}
     {hoveredDirectory}
@@ -119,7 +119,7 @@
 
   {#if openDirectories.includes(directory.name)}
     {#each directory.files as file}
-      <File
+      <FEItem
         entryElem={file}
         fileType={"file"}
         parentDirectoryName={directory.name}

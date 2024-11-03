@@ -7,7 +7,7 @@
     directory,
     handleDirectoryClick,
     hoveredDirectory,
-    isOpen,
+    openDirectories,
     fileOperationButtons,
     fileOperationButton,
     handleRenaming,
@@ -15,7 +15,7 @@
     directory: DBDirectoryEntry;
     handleDirectoryClick: (directoryName: string, e: HTMLElement, isEditing: boolean) => void;
     hoveredDirectory: string | null;
-    isOpen: string[];
+    openDirectories: string[];
     fileOperationButtons: FileOperationButton[];
     fileOperationButton: (
       icon: string,
@@ -36,12 +36,12 @@
   onclick={(e) => handleDirectoryClick(directory.name, e.target as HTMLElement, directory.isEditing)}
   onmouseenter={() => hoveredDirectory = directory.name}
   onmouseleave={() => hoveredDirectory = null}
-  style:background={isOpen.includes(directory.name)? "#333232a6":""}
-  style:color={isOpen.includes(directory.name)? "white":""}
+  style:background={openDirectories.includes(directory.name)? "#333232a6":""}
+  style:color={openDirectories.includes(directory.name)? "white":""}
 >
   <span>
     <Icon
-      name={isOpen.includes(directory.name) ? "folder2-open" : "folder"}
+      name={openDirectories.includes(directory.name) ? "folder2-open" : "folder"}
       style="cursor: pointer;"
     />
     &nbsp;

@@ -13,6 +13,8 @@
     handleDeleteFile,
     handleRenaming,
     openFile,
+    openDirectories,
+    modifyOpenDirectories,
     selectedFile,
   }: {
     directories: DBDirectoryEntry[];
@@ -21,10 +23,12 @@
     handleDeleteFile: (type: string, elem: DBDirectoryEntry | FileEntry) => void;
     handleRenaming: (elem: DBDirectoryEntry | FileEntry, e: KeyboardEvent) => void;
     openFile: (e: HTMLElement) => void;
+    openDirectories: string[];
+    modifyOpenDirectories: (newArray: string[]) => void;
     selectedFile: string | null;
   } = $props();
 
-  let isOpen: string[] = $state([]);
+  
   // biome-ignore lint/style/useConst: svelte variable
   let hoveredDirectory: string | null = $state(null);
   // biome-ignore lint/style/useConst: svelte variable
@@ -43,11 +47,13 @@
       return;
     }
 
-    if (isOpen.includes(directoryName)) {
-      const newArray = isOpen.filter((name) => name !== directoryName);
-      isOpen = newArray;
+    if (openDirectories.includes(directoryName)) {
+      modifyOpenDirectories(openDirectories.filter((name) => name !== directoryName));
     } else {
-      isOpen.push(directoryName);
+      const newArray = [...openDirectories]
+      newArray.push(directoryName);
+
+      modifyOpenDirectories(newArray)
     }
   }
 
@@ -104,13 +110,13 @@
     {directory}
     {handleDirectoryClick}
     {hoveredDirectory}
-    {isOpen}
+    {openDirectories}
     {fileOperationButtons}
     {fileOperationButton}
     {handleRenaming}
   />
 
-  {#if isOpen.includes(directory.name)}
+  {#if openDirectories.includes(directory.name)}
     {#each directory.files as file}
       <File
         {file}

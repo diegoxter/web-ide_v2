@@ -24,10 +24,11 @@
   } from "$lib";
   import { onMount } from "svelte";
 
-  let isOpen: boolean = $state(true);
+  let isSidebarOpen: boolean = $state(true);
   let files: DBDirectoryEntry[] = $state([]);
   let activeBar: string = $state("files");
   let db: IDBDatabase | null = $state(null);
+  let openDirectories: string[] = $state([]);
 
   // biome-ignore lint/style/useConst: svelte variable
   let links = [
@@ -52,9 +53,10 @@
   let hoveredTab = $state("");
   let selectedFile: string | null = $state(null);
   let oldRenamedName: string | null = $state(null);
+  let tempNewName: string | null = $state(null);
 
   function closeSidebar(isCurrentTab: boolean, newTab: string) {
-    isOpen = isCurrentTab ? !isOpen : true;
+    isSidebarOpen = isCurrentTab ? !isSidebarOpen : true;
     activeBar = newTab;
   }
 
@@ -132,33 +134,58 @@
     }
   }
 
-  function handleNewFile(type: string, elem: DBDirectoryEntry | FileEntry) {
-    if (type === "file") {
-      console.log("newFile! ", type);
-    } else {
-      console.log("newDirectory! ", type);
-      const directoryIndex = files.findIndex(
-        (directory) => directory.name === elem.name && directory.id === elem.id,
-      );
+  function handleNewFile(_: string, elem: DBDirectoryEntry | FileEntry) {
+    const isAnyEditing = files.some((directory) =>
+      directory.files.some((file) => file.isEditing),
+    );
 
-      files[directoryIndex].files.push({
-        name: "new file.lua",
-        content: "new file content",
-        id: 99,
-        directoryId: files[directoryIndex].id,
-        isEditing: false,
-      });
+    if (isAnyEditing) {
+      return;
     }
+
+    const directoryIndex = files.findIndex(
+      (directory) => directory.name === elem.name && directory.id === elem.id,
+    );
+
+    if (!openDirectories.includes(files[directoryIndex].name)) {
+      openDirectories.push(files[directoryIndex].name);
+    }
+
+    files[directoryIndex].files.push({
+      name: "",
+      content: "",
+      id: 99,
+      directoryId: files[directoryIndex].id,
+      isEditing: true,
+    });
   }
 
-  function handleDeleteFile(type: string, elem: DBDirectoryEntry | FileEntry) {
-    if (type === "file") {
-      console.log("deleteFile! ", type);
-    } else {
-      console.log("deleteDirectory! ", type);
-    }
+  const isDBDirectoryEntry = (file: any): file is DBDirectoryEntry => {
+    return "id" in file && "name" in file && !("directoryId" in file);
+  };
 
-    console.log($state.snapshot(elem));
+  const deleteFile = (file: DBDirectoryEntry | FileEntry) => {
+    if (isDBDirectoryEntry(file)) {
+      files = files.filter(
+        (dir) => dir.name !== file.name && dir.id !== file.id,
+      );
+    } else {
+      const workingDir: number = files.findIndex(
+        (dir: DBDirectoryEntry) => dir.id === (file as FileEntry).directoryId,
+      )!;
+
+      files[workingDir].files = files[workingDir].files.filter(
+        (item: FileEntry) => item.id !== (file as FileEntry).id,
+      );
+    }
+  };
+
+  const modifyOpenDirectories = (newArray: string[]) => {
+    openDirectories = newArray;
+  };
+
+  function handleDeleteFile(_: string, elem: DBDirectoryEntry | FileEntry) {
+    deleteFile(elem);
   }
 
   function handleRenameFile(_: string, elem: DBDirectoryEntry | FileEntry) {
@@ -169,7 +196,28 @@
     elem: DBDirectoryEntry | FileEntry,
     e: KeyboardEvent,
   ) {
-    oldRenamedName = elem.name;
+    if (!oldRenamedName) {
+      oldRenamedName = elem.name;
+    }
+
+    tempNewName = (e.target as HTMLInputElement).value;
+
+    const stopEditing = (finalName: string) => {
+      if (tempNewName === finalName && finalName === "") {
+        deleteFile(elem);
+      } else {
+        elem.name = finalName;
+        elem.isEditing = false;
+      }
+      oldRenamedName = null;
+      tempNewName = null;
+
+      return;
+    };
+
+    if (e.key === "Escape") {
+      stopEditing("");
+    }
 
     if (e.key === "Enter") {
       let existingNames: string[] = [""];
@@ -184,19 +232,12 @@
         existingNames = workingDir.files.map((file) => file.name);
       }
 
-      const stopEditing = () => {
-        oldRenamedName = null;
-        elem.isEditing = false;
-      };
-
-      if (elem.name === "" || existingNames.includes(elem.name)) {
-        elem.name = oldRenamedName;
-        stopEditing();
+      if (tempNewName === "" || existingNames.includes(tempNewName)) {
+        stopEditing(oldRenamedName);
+        return;
       }
 
-      stopEditing();
-    } else {
-      elem.name = (e.target as HTMLInputElement).value;
+      stopEditing((e.target as HTMLInputElement).value);
     }
   }
 
@@ -280,7 +321,7 @@
     <Col
       class="border-end border-2"
       xs="2"
-      style={`display: ${isOpen ? "block" : "none"}`}
+      style={`display: ${isSidebarOpen ? "block" : "none"}`}
     >
       {#if activeBar == "files"}
         <FileExplorerBar
@@ -290,6 +331,8 @@
           {handleDeleteFile}
           {handleRenaming}
           {openFile}
+          {openDirectories}
+          {modifyOpenDirectories}
           {selectedFile}
         />
       {:else if activeBar == "deploy"}

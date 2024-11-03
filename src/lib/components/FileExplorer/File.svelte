@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Icon } from "@sveltestrap/sveltestrap";
-  import type { Snippet } from "svelte";
+  import { onMount, type Snippet } from "svelte";
 
   // biome-ignore lint/style/useConst: svelte variable
   let {
@@ -29,6 +29,14 @@
     returnLiBackground: (fileName: string, directoryName: string) => string | string | undefined;
     handleRenaming: (elem: DBDirectoryEntry | FileEntry, e: KeyboardEvent) => void;
   } = $props();
+
+  let itemRef: HTMLElement | null = $state(null)
+
+  onMount(() => {
+    if (file.isEditing) {
+      itemRef!.focus()
+    }
+  })
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -43,7 +51,7 @@
   <span id={`${directory.name}-${file.name}`}>
     <Icon name="file-code" onclick={(e)=> e.stopPropagation}/>
     {#if file.isEditing}
-      <input id="plainExample" type="text" value={file.name} onkeydowncapture={(e)=>handleRenaming(file, e)}/>
+      <input bind:this={itemRef} id="plainExample" type="text" value={file.name} onkeydowncapture={(e)=>handleRenaming(file, e)}/>
     {:else}
       <span id={`${directory.name}-${file.name}`}>
         {file.name}
